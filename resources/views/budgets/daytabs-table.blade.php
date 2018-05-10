@@ -1,4 +1,4 @@
-<table class="table table-condensed" style="width:100%;">
+<table class="table table-condensed day-table" style="width:100%;" data-date="{{ $day->generateName() }}">
 <thead>
     <tr class="text-center">
     	@unless ($readonly)
@@ -27,9 +27,12 @@
 	@if ($person->scene !== $last_scene)
 		<tr><td colspan="8" class="bg-info">
 			<em>Scene: {{ $person->scene }}</em>
-			<button type="button" class="btn btn-primary btn-xs pull-right"
-				data-toggle="modal" data-target="#sceneModal" 
-				data-day-id="{{ $day->id }}" data-scene="{{ $person->scene }}">Modify Scene</button>
+            @unless ($readonly)
+    			<button type="button" class="btn btn-primary btn-xs pull-right"
+    				data-toggle="modal" data-target="#sceneModal" 
+    				data-day-id="{{ $day->id }}" data-scene="{{ $person->scene }}">Modify Scene</button>
+            @endunless
+
 		</td></tr>
 		@php 
 			$last_scene = $person->scene;
@@ -79,16 +82,13 @@
 </tbody>
 <tfoot>
 	<tr>
-		<td colspan="2">
-			@unless ($readonly)
-			<a href="{{ route('people.create', ['budget_id' => $budget->id, 'day_id' => $day->id]) }}" class="btn btn-warning btn-xs">Add a New Person/Group</a>
-			@endunless
-		</td>
-		<td colspan="5" class="text-right"><strong>TOTAL:</strong></td>
-		<td headers="amount_col" class="text-right"><strong>{{ number_format($day->calcTotalAmount(), 2) }}</strong></td>
-		@unless ($readonly)
-			<td headers="action_col"></td>
-		@endunless
-	</tr>
+        @unless ($readonly)
+    		<td colspan="2">
+    			<a href="{{ route('people.create', ['budget_id' => $budget->id, 'day_id' => isset($day) ? $day->id : '']) }}" class="btn btn-warning btn-xs">Add a New Person/Group</a>
+    		</td>
+        @endunless
+		<td colspan="{{ $readonly ? 6 : 5 }}" class="text-right"><strong>TOTAL:</strong></td>
+		<td headers="amount_col" class="text-right"><strong>{{ number_format(isset($day) ? $day->calcTotalAmount() : 0, 2) }}</strong></td>
+</tr>
 </tfoot>
 </table>

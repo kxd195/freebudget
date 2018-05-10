@@ -42,5 +42,5 @@ function showHide(selector, show) {
 
 }
 function parseAmount(val) {
-	return parseFloat(val.replace(/,/gi, ""));
+	return parseFloat(val.replace(/,/gi, ""), 10);
 }

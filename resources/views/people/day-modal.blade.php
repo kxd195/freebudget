@@ -17,14 +17,15 @@
         				Select all
         			</label>
         			</div>
-        		@foreach ($entry->budget->days->sortBy('actualdate') as $day)
-            		<div class="col-md-6 checkbox {{ $day->id === $entry->day_id ? 'text-success' : '' }}">
-            		<label>
-            			{{ Form::checkbox('multiple_day_id', $day->id, $day->id === $entry->day_id) }}
-            			{{ $day->generateName() }}{{ $day->id === $entry->day_id ? '**' : '' }}
-            		</label>
-            		</div>
-        		@endforeach
+    
+            		@foreach ($days->keys() as $day_id)
+                		<div class="col-md-6 checkbox {{ $day_id === $entry->day_id || (empty($day_id) && empty($entry->day_id)) ? 'text-success' : '' }}">
+                		<label>
+                			{{ Form::checkbox('multiple_day_id', $day_id, $day_id === $entry->day_id || (empty($day_id) && empty($entry->day_id))) }}
+                			{{ $days->get($day_id) }}{{ $day_id === $entry->day_id || (empty($day_id) && empty($entry->day_id)) ? '**' : '' }}
+                		</label>
+                		</div>
+            		@endforeach
         		</div>
         	</div>
     		</div>

@@ -60,7 +60,7 @@ class BudgetController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id, $from_share = false, $read_only = false) {
+    public function show($id, $from_share = false, $read_only = false, Request $request) {
         $budget = Budget::findOrFail($id);
         $budget->days = $budget->days->sortBy('actualdate');
 
@@ -81,7 +81,11 @@ class BudgetController extends Controller {
         
         $units = Unit::all();
         $scenes = $budget->getScenes();
-        
+        $printer_friendly = $request->get('pf');
+
+        if ($printer_friendly)
+            return view('budgets.print', ['budget' => $budget, 'units' => $units, 'days' => $days, 'scenes' => $scenes, 'from_share' => $from_share, 'readonly' => $read_only]);
+
         return view('budgets.show', ['budget' => $budget, 'units' => $units, 'days' => $days, 'scenes' => $scenes, 'from_share' => $from_share, 'readonly' => $read_only]);
     }
     

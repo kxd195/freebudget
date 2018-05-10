@@ -14,19 +14,7 @@
 @component('components.messages')
 @endcomponent
 
-<a href="javascript:showAll()">Show All</a>
-
-@if ($readonly)
-    <div class="alert alert-danger" role="alert">
-        <strong>IMPORTANT:</strong> You are currently viewing a read-only version/snapshot of this budget. 
-    </div>
-@endif
-
-<div class="small">
-	<a href="{{ route('home') }}"><strong>Home</strong></a>
-	&gt; <a href="{{ route('shows.edit', $budget->show_id) }}"><strong>{{ $budget->show->name }}</strong></a>
-	&gt; {{ $budget->name }}
-</div>
+<h1>{{ $budget->show->name }} - {{ $budget->name }}</h1>
 
 <div class="row" id="budget_row">
 <div class="col-md-9">

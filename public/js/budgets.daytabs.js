@@ -65,6 +65,16 @@ function dayQuickjump() {
 
 }
 
+
+function showAll() {
+	$('#tabAll').parent().addClass('active');  
+	$('.tab-pane').addClass('active in');  
+	$('[data-toggle="tab"]').parent().removeClass('active');
+
+	$(".row-day-info").hide();
+	$(".day-table:first tbody").append( $(".day-table:not(:first) tbody tr") );
+}
+
 function createShare() {
 	var CSRF_TOKEN = $("meta[name='csrf-token']").attr("content");
 

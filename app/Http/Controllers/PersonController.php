@@ -18,7 +18,6 @@ class PersonController extends Controller {
     
     public function run_validation(Request $request) {
         $this->validate($request, [
-            'day_id' => 'required',
             'unit_id' => 'required',
             'description' => 'required',
         ]);
@@ -89,7 +88,7 @@ class PersonController extends Controller {
         $days = $day_entries->pluck('display_name', 'id');
 
         $days->prepend("Undated Entries", '');
-        echo $days;
+
         $units = Unit::all()->pluck('name', 'id');
         $scenes = Budget::getScenesFromBudget($entry->budget->id);
         
@@ -134,7 +133,7 @@ class PersonController extends Controller {
 
         foreach ($day_ids as $day_id) {
             $person = $isFirstEntry ? $entry : $entry->replicate();
-            $person->day_id = $day_id;
+            $person->day_id = empty($day_id) ? null : $day_id;
             $person->disableVersioning();
             $person->save();
             

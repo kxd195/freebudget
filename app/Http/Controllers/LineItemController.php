@@ -15,7 +15,6 @@ class LineItemController extends Controller {
     
     public function run_validation(Request $request) {
         $this->validate($request, [
-            'day_id' => 'required',
             'unit_id' => 'required',
             'rate_class_id' => 'required',
             'description' => 'required',

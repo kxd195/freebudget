@@ -53,7 +53,7 @@ function selectAllDays() {
 
 function removeRow(obj) {
 	var row = $(obj).closest("tr");
-	var iteration = parseInt( $(row).find("[id^='qty_']").attr("id").replace(/[\D]/gi, "") );
+	var iteration = parseInt( $(row).find("[id^='qty_']").attr("id").replace(/[\D]/gi, ""), 10 );
 	
 	for (var next_row = $(row).next(); next_row.length !== 0; next_row = $(next_row).next()) {
 		$(next_row).find(":input").each(function() {
@@ -170,14 +170,14 @@ function recalculate(obj) {
 	var isAddon = $("#rate_class_id_" + iteration + " option:selected").data("addon") === 1;
 	showHide($(obj).closest("tr").find(".quick-action-buttons"), !isAddon);
 
-	var hours = isNaN($("#hours_" + iteration).val()) || $("#hours_" + iteration).val().length === 0 ? 0 : parseInt($("#hours_" + iteration).val());
+	var hours = isNaN($("#hours_" + iteration).val()) || $("#hours_" + iteration).val().length === 0 ? 0 : parseInt($("#hours_" + iteration).val(), 10);
 	var url = CONTEXT_PATH + "/api/calcPayroll/" + hours;
 	
 	$.getJSON(url, function(jsonObj) {
 		$("#payroll_" + iteration).val(jsonObj.result);
 		
-		var qty = parseInt($("#qty_" + iteration).val());
-		var payroll = parseFloat($("#payroll_" + iteration).val());
+		var qty = parseInt($("#qty_" + iteration).val(), 10);
+		var payroll = parseFloat($("#payroll_" + iteration).val(), 10);
 		var cost = parseAmount($("#cost_" + iteration).val());
 
 		$("#amount_" + iteration).val((qty * payroll * cost).toFixed(2));
@@ -193,7 +193,7 @@ function calcSecondCategory() {
 		var iteration = $(this).attr("id").replace(/[\D]/gi, "");
 		var curr_cost = parseFloat($(this).val());
 		
-		if (parseInt($("#rate_class_id_" + iteration + " option:selected").data("addon")) === 0) {
+		if (parseInt($("#rate_class_id_" + iteration + " option:selected").data("addon"), 10) === 0) {
 			if (highest_cost < curr_cost) {
 				highest_cost = curr_cost;
 				highest_cost_row = iteration;
@@ -205,7 +205,7 @@ function calcSecondCategory() {
 		var iteration = $(this).attr("id").replace(/[\D]/gi, "");
 		var curr_cost = parseFloat($(this).val());
 		
-		if (parseInt($("#rate_class_id_" + iteration + " option:selected").data("addon")) === 0
+		if (parseInt($("#rate_class_id_" + iteration + " option:selected").data("addon"), 10) === 0
 				&& iteration !== highest_cost_row) {
 			if (highest_cost > curr_cost) {
 				$(this)

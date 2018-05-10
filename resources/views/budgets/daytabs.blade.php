@@ -4,19 +4,18 @@
 
 <div class="row">
 <div class="col-md-3 col-md-offset-9">
-<select id="day-quickjump" name="day-quickjump" class="form-control" onchange="dayQuickjump()">
-    <option disabled="disabled" hidden="hidden" selected="selected">Jump to another day...</option>
-    @foreach ($budget->days as $day)
-    		<option value="#day{{ $day->id }}">{{ $day->generateName() }}</option>
-    @endforeach
-</select>
+    <select id="day-quickjump" name="day-quickjump" class="form-control" onchange="dayQuickjump()">
+        <option disabled="disabled" hidden="hidden" selected="selected">Jump to another day...</option>
+        @foreach ($budget->days as $day)
+        		<option value="#day{{ $day->id }}">{{ $day->generateName() }}</option>
+        @endforeach
+    </select>
 </div>
 </div>
 
 <div class="row">
 <div class="col-md-12">
 
-<!-- Nav tabs -->
 <ul class="nav nav-tabs small" role="tablist">
 @php $curr_day = 0; @endphp
     <li role="presentation" class="{{ 0 === $show_day_id ? 'active' : '' }}">
@@ -51,19 +50,19 @@
             <div class="panel-heading">Day Totals</div>
             <div class="panel-body form-horizontal small">
                 @foreach ($units as $unit)
-                        @php $amount = $unit->calcTotalAmount($day->id) @endphp
-                    
-                        @if ($amount != 0)
-                            <div class="row">
-                            <label class="col-xs-7 control-label">{{ $unit->name }}:</label>
-                            <div class="col-xs-5 text-right form-control-static"><strong>{{ number_format($amount, 2) }}</strong></div>
-                        </div>
-                        @endif
+                    @php $amount = isset($day) ? $unit->calcTotalAmount($day->id) : 0; @endphp
+                
+                    @if ($amount != 0)
+                        <div class="row">
+                        <label class="col-xs-7 control-label">{{ $unit->name }}:</label>
+                        <div class="col-xs-5 text-right form-control-static"><strong>{{ number_format($amount, 2) }}</strong></div>
+                    </div>
+                    @endif
                 @endforeach
                 
                 <div class="row">
                     <label class="col-xs-7 control-label">Total:</label>
-                    <div class="col-xs-5 text-right form-control-static text-danger"><strong>{{ number_format($day->calcTotalAmount(), 2) }}</strong></div>
+                    <div class="col-xs-5 text-right form-control-static text-danger"><strong>{{ number_format(isset($day) ? $day->calcTotalAmount() : 0, 2) }}</strong></div>
                 </div>
             </div>
             </div>
@@ -78,6 +77,7 @@
 		$last_unit = null;
 		$last_location = null;
 	@endphp
+
     <div role="tabpanel" class="tab-pane {{ $day->id === $show_day_id ? 'active' : '' }}" id="day{{ $day->id }}">
 		<div class="row row-day-info">
 		<div class="col-md-9">
@@ -167,6 +167,7 @@
         </div>
 		@include('budgets.daytabs-table', ['people_entries' => $day->people])        
     </div>
+
     @php $curr_day++ @endphp
 @endforeach
 </div>
