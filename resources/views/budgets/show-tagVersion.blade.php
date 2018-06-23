@@ -7,6 +7,7 @@
         <h4 class="modal-title">Tag as Version</h4>
     </div>
     <div class="modal-body">
+      <div class="form form-horizontal">
    		<p>Tagging as version captures a read-only snapshot of your current budget.</p>
    		
    		<div class="form-group">
@@ -15,6 +16,7 @@
    			{{ Form::text('name', $value = null, ['class' => 'form-control']) }}
    			</div>
    		</div>
+    </div>
     </div>
     <div class="modal-footer">
 		<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

@@ -1,6 +1,6 @@
 <?php
 
-use App\LineItem;
+use App\Person;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,5 +21,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('calcPayroll/{hours}', function($hours) {
     return response()
-            ->json(['result' => number_format(LineItem::calculatePayroll($hours), 1)]);
+            ->json(['result' => number_format(Person::calculatePayroll($hours), 1)]);
 });

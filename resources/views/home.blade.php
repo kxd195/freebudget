@@ -11,22 +11,29 @@
     <div class="panel-heading"><h1 class="panel-title">Home</h1></div>
 
     <div class="panel-body">
-        <strong>Recently Updated Shows</strong>
+        <a href="{{ route('productions.create') }}" class="btn btn-primary pull-right">Create New Production</a>
+        <strong>Current Productions</strong>
         <ul>
-        @foreach ($list as $show)
+        @foreach ($list as $production)
         		<li>
-            		<a href="{{ route('shows.edit', $show->id) }}">{{ $show->name }}</a>
+            		<a href="{{ route('productions.edit', $production->id) }}">{{ $production->name }}</a>
         			<ul>
-        			@foreach ($show->budgets as $budget)
+        			@foreach ($production->budgets as $budget)
         				<li><a href="{{ route('budgets.show', $budget->id) }}">{{ $budget->name }}</a></li>
         			@endforeach
-    				<li><a href="{{ route('budgets.create', ['show_id' => $show->id]) }}"><em>Create a New Budget</em></a></li>
+    				<li><a href="{{ route('budgets.create', ['production_id' => $production->id]) }}"><em>Create a New Budget</em></a></li>
         			</ul>
         		</li>
         @endforeach
         </ul>
 
-        	<a href="{{ route('shows.create') }}" class="btn btn-primary pull-right">Create a New Show</a>
+    </div>
+
+    <div class="panel-body">
+        <strong>Completed Productions</strong>
+        <ul>
+
+        </ul>
     </div>
 </div>
 @endsection

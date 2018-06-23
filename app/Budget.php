@@ -14,8 +14,8 @@ class Budget extends Model {
     use VersionableTrait;
     use FormAccessible;
     
-    protected $fillable = ['show_id', 'name', 'description', 'startdate', 'enddate', 'num_days', 'notes'];
-    protected $touches = ['show'];
+    protected $fillable = ['production_id', 'name', 'description', 'episode', 'startdate', 'enddate', 'num_days', 'notes'];
+    protected $touches = ['production'];
     protected $dates = ['startdate', 'enddate'];
     
     public function budget_versions() {
@@ -26,12 +26,16 @@ class Budget extends Model {
         return $this->hasMany('App\Day');
     }
 
+    public function scenes() {
+        return $this->hasMany('App\Scene');
+    }
+
     public function undated_entries() {
         return $this->hasMany('App\Person')->whereNull('day_id');
     }
     
-    public function Show() {
-        return $this->belongsTo('App\Show');
+    public function Production() {
+        return $this->belongsTo('App\Production');
     }
     
     public function autoCreate() {
@@ -44,7 +48,7 @@ class Budget extends Model {
             || (isset($this->enddate) && $currDate->lte($this->enddate))) {
                 $dayOfWeek = $currDate->dayOfWeek;
                 
-                if ($this->show->getWorkingDays()[$dayOfWeek]) {
+                if ($this->production->getWorkingDays()[$dayOfWeek]) {
                     if (!isset($firstWorkDay))
                         $firstWorkDay = $dayOfWeek;
                     
@@ -58,10 +62,10 @@ class Budget extends Model {
                     
                     // if it's the start of a new week, add the assistant entry
                     if ($dayOfWeek === Carbon::MONDAY)
-                        Person::createPersonFromRateClass($newDay->id, $mainUnit->id, 'AS', $this->show->assistant_rate);
+                        Person::createPersonFromRateClass($this->id, $newDay->id, $mainUnit->id, 'AS', $this->production->assistant_rate);
 
                     // ad a wrangler entry for each day
-                    // Person::createPersonFromRateClass($newDay->id, $mainUnit->id, 'WR', $this->show->wrangler_rate, 8);
+                    // Person::createPersonFromRateClass($newDay->id, $mainUnit->id, 'WR', $this->production->wrangler_rate, 8);
                 }
                 
                 $currDate->addDay();
@@ -80,17 +84,14 @@ class Budget extends Model {
             
             foreach ($day->people as $person) {
                 $people_array = ['person_version_id' => $person->tagVersion()];
-                
-                foreach ($person->line_items as $item) {
-                    $line_items_array = ['line_item_version_id' => $item->tagVersion()];
-                    $people_array['line_items'][] = $line_items_array;
-                }
-                
                 $day_array['people'][] = $people_array;
             }
 
             $version_data['days'][] = $day_array;
         }
+
+        foreach ($this->scenes as $scene)
+            $version_data['scenes'][] = ['scene_version_id' => $scene->tagVersion()];
         
         $budget_version = new BudgetVersion();
         $budget_version->budget_id = $this->id;
@@ -100,22 +101,10 @@ class Budget extends Model {
         $budget_version->save();
     }
     
-    public static function getScenesFromBudget($budget_id) {
-        return Budget::find($budget_id)->getScenes();
+    public function calcStats() {
+        RateClass::all();
     }
-    
-    public function getScenes() {
-        $scenes = [];
-        foreach ($this->days as $day) {
-            foreach ($day->people as $person)
-                if (isset($person->scene))
-                    $scenes[$person->scene] = $person->scene;
-        }
-        ksort($scenes);
-        
-        return $scenes;
-    }
-    
+
     public function calcStandIn() {
         $total = 0;
         foreach($this->days as $day)

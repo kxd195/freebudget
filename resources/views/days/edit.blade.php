@@ -10,8 +10,8 @@ var existingDays = [ @foreach ($entry->budget->days as $day) "{{ $day->actualdat
 @section('content')
 <div class="small">
 	<a href="{{ route('home') }}"><strong>Home</strong></a>
-	&gt; <a href="{{ route('shows.edit', $entry->budget->show_id) }}"><strong>{{ $entry->budget->show->name }}</strong></a>
-	&gt; <a href="{{ route('budgets.show', ['id' => $entry->budget_id, 'show_day_id' => $entry->id]) }}"><strong>{{ $entry->budget->name }}</strong></a>
+	&gt; <a href="{{ route('productions.edit', $entry->budget->production_id) }}"><strong>{{ $entry->budget->production->name }}</strong></a>
+	&gt; <a href="{{ route('budgets.show', ['id' => $entry->budget_id]) }}"><strong>{{ $entry->budget->name }}</strong></a>
 	&gt; {{ isset($entry->id) ? 'Modify an Existing' : 'Create a New' }} Day
 </div>
 <div class="panel panel-primary">
@@ -54,21 +54,13 @@ var existingDays = [ @foreach ($entry->budget->days as $day) "{{ $day->actualdat
     	</div>
     </div>
 
-    	<div class="form-group @if ($errors->has('location')) has-error @endif">
-    		{{ Form::label('location', 'Location:', ['class' => 'col-md-3 control-label']) }}
-    		<div class="col-md-9">
-    		{{ Form::text('location', $entry->location, ['class' => 'form-control']) }}
-    		@if ($errors->has('location')) <p class="help-block">{{ $errors->first('location') }}</p> @endif
-    		</div>
-    	</div>
-
-    	<div class="form-group @if ($errors->has('crew_call')) has-error @endif">
-    		{{ Form::label('crew_call', 'Estimated Crew Call:', ['class' => 'col-md-3 control-label']) }}
-    		<div class="col-md-9">
-    		{{ Form::text('crew_call', $entry->crew_call, ['class' => 'form-control']) }}
-    		@if ($errors->has('crew_call')) <p class="help-block">{{ $errors->first('crew_call') }}</p> @endif
-    		</div>
-    	</div>
+	<div class="form-group @if ($errors->has('crew_call')) has-error @endif">
+		{{ Form::label('crew_call', 'Estimated Crew Call:', ['class' => 'col-md-3 control-label']) }}
+		<div class="col-md-9">
+		{{ Form::text('crew_call', $entry->crew_call, ['class' => 'form-control']) }}
+		@if ($errors->has('crew_call')) <p class="help-block">{{ $errors->first('crew_call') }}</p> @endif
+		</div>
+	</div>
     
 	<div class="form-group @if ($errors->has('notes')) has-error @endif">
 		{{ Form::label('notes', 'Notes:', ['class' => 'col-md-3 control-label']) }}

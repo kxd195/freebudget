@@ -1,13 +1,6 @@
 $(function() {
-	$(".nav-tabs").scrollingTabs({
-		tabClickHandler: function (e) {
-			var day_id = $(this).attr("aria-controls");
-			$("#day-quickjump option[value='#" + day_id + "']").prop("selected", true);
-		  }  
-	});
+	calcTotals();
 	
-	$("#budget_row .panel, .row-day-info .panel").matchHeight();
-
 	$("#tagVersionModal").on("shown.bs.modal", function () {
 		$("#tagVersionModal :input:first").focus();
 	})
@@ -15,20 +8,20 @@ $(function() {
 	$("#shareCreateButton").on("click", createShare);
 	initShareClipboard();
 	
-	if ($(".nav-tabs li[role='presentation'].active").length === 0)
-		setDefaultDayTab();
-	
 	// when the scene modal is shown, load input fields with data
-	$('#sceneModal').on("show.bs.modal", function (event) {
+	$("#sceneModal").on("show.bs.modal", function (event) {
 		var button = $(event.relatedTarget);
-		var scene = button.data("scene");
-		var day_id = button.data("day-id");
+		var scene_id = button.data("scene");
 		var modal = $(this);
-		  
-		modal.find("select[name='scene'] option[value='" + scene + "']").attr("selected", true);
-		modal.find("select[name='day_id'] option[value='" + day_id + "']").attr("selected", true);
-		modal.find("input[name='old_day_id']").val(day_id);
-		modal.find("input[name='old_scene']").val(scene);
+
+		// set the selects according to the modify button clicked
+		modal.find("#scene-name").val(button.data("scene-name")).focus();
+		modal.find("#location").val(button.data("location"));
+		modal.find("#description").val(button.data("description"));
+		modal.find("#notes").val(button.data("notes"));
+		modal.find("#day-name").html(button.data("day-name"));
+		modal.find("[name='day_id']").val(button.data("day-id"));
+		modal.find("form").attr("action", modal.find("form").attr("action").replace(/scene-info-here/gi, scene_id));
 	});
 });
 
@@ -43,37 +36,28 @@ function initShareClipboard() {
 	});
 }
 
-function setDefaultDayTab() {
-	var tabSet = false;
-	$("[role='tab']").each(function() {
-		if (tabSet)
-			return;
-		
-		$currDate = new moment($(this).data("actualdate"));
-		if ($currDate.isSameOrAfter(new moment())) {
-			$(this).click();
-			tabSet = true;
-		}
-	});
-}
-
 function dayQuickjump() {
 	var day_id = $("#day-quickjump").val();
 	
-	$("a[href='" + day_id + "'][role='tab']").click();
-	$(".nav-tabs").scrollingTabs('refresh');
+	if (day_id === "ALL")
+		$("#dayTable tbody[data-day-id]").show();
+	else {
+		$("#dayTable tbody[data-day-id='" + day_id +"']").show();
+		$("#dayTable tbody[data-day-id!='" + day_id +"']").hide();
+	}
 
+	calcTotals();
 }
 
+function calcTotals() {
+	var grandTotal = 0;
+	$("#dayTable tbody[data-day-id]:visible td[headers='amount_col'].line-item-amount").each(function() {
+		grandTotal += parseAmount($(this).html());
+	});
 
-function showAll() {
-	$('#tabAll').parent().addClass('active');  
-	$('.tab-pane').addClass('active in');  
-	$('[data-toggle="tab"]').parent().removeClass('active');
-
-	$(".row-day-info").hide();
-	$(".day-table:first tbody").append( $(".day-table:not(:first) tbody tr") );
+	$("#grandTotal").html(grandTotal.formatMoney(2));
 }
+
 
 function createShare() {
 	var CSRF_TOKEN = $("meta[name='csrf-token']").attr("content");

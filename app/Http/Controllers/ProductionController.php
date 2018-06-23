@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Show;
+use App\Production;
 use Illuminate\Http\Request;
 
-class ShowController extends Controller {
+class ProductionController extends Controller {
     public function __construct() {
         $this->middleware('auth');
     }
@@ -14,6 +14,8 @@ class ShowController extends Controller {
         $this->validate($request, [
             'name' => 'required',
             'type' => 'required',
+            'qty' => 'numeric',
+            'num_union' => 'numeric',
         ]);
     }
     
@@ -23,7 +25,7 @@ class ShowController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        return view('shows.list', ['list' => Show::all()->sortBy('name')]);
+        return view('productions.list', ['list' => Production::all()->sortBy('name')]);
     }
 
     /**
@@ -52,7 +54,7 @@ class ShowController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function show($id) {
-        return view('shows.show', ['entry' => Show::findOrFail($id)]);
+        return view('productions.show', ['entry' => Production::findOrFail($id)]);
     }
 
     /**
@@ -62,8 +64,8 @@ class ShowController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function edit($id) {
-        $entry = $id !== 0 ? Show::findOrFail($id) : new Show();
-        return view('shows.edit', ['entry' => $entry]);
+        $entry = $id !== 0 ? Production::findOrFail($id) : new Production();
+        return view('productions.edit', ['entry' => $entry]);
     }
 
     /**
@@ -76,7 +78,7 @@ class ShowController extends Controller {
     public function update(Request $request, $id) {
         $this->run_validation($request);
         
-        $entry = $id !== 0 ? Show::findOrFail($id) : new Show($request->all());
+        $entry = $id !== 0 ? Production::findOrFail($id) : new Production($request->all());
         $success = $id !== 0 ? $entry->update($request->all()) : $entry->save();
         if (!$success) {
             return redirect()->back()
@@ -84,7 +86,7 @@ class ShowController extends Controller {
                     ->withInput();
         }
         
-        return redirect()->route('shows.index')
+        return redirect()->route('productions.index')
                 ->with('message', 'Your changes has been successfully saved!');
     }
 
@@ -95,7 +97,7 @@ class ShowController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function destroy($id) {
-        $entry = Show::find($id);
+        $entry = Production::find($id);
         if (!$entry->delete()) {
             return redirect()->back()
                     ->with('message-danger', 'Something wrong happened while deleting')
@@ -103,6 +105,6 @@ class ShowController extends Controller {
         }
         
         return redirect()->route('home')
-                ->with('message-warning', 'The show "' . $entry->name . '" has been successfully deleted!');
+                ->with('message-warning', 'The production "' . $entry->name . '" has been successfully deleted!');
     }
 }

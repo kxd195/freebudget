@@ -13,3 +13,4 @@
 .bg-blue { background-color:#B8DEFC; }
 .bg-indigo { background-color:#AEBCFC; }
 .bg-violet { background-color:#D3B0F2; }
+.control-label { text-align:left !important; }

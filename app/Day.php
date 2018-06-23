@@ -13,7 +13,7 @@ class Day extends Model {
     use VersionableTrait;
     use FormAccessible;
     
-    protected $fillable = ['budget_id', 'name', 'actualdate', 'location', 'crew_call', 'notes'];
+    protected $fillable = ['budget_id', 'name', 'actualdate', 'crew_call', 'notes'];
     protected $touches = ['budget'];
     protected $dates = ['actualdate'];
     
@@ -26,6 +26,9 @@ class Day extends Model {
     }
     
     public function generateName() {
+        if ($this->id === 0)
+            return $this->name;
+
         return "Day {$this->name} ({$this->actualdate->format('D, M j, Y')})"; 
     }
 
@@ -39,9 +42,8 @@ class Day extends Model {
     public function calcStandIn() {
         $total = 0;
         foreach ($this->people as $person)
-            foreach($person->line_items as $item)
-                if ($item->rateclass->code === 'SI')
-                    $total += $item->qty;
+            if ($person->rateclass->code === 'SI')
+                $total += $person->qty;
                     
         return $total;
     }
@@ -49,19 +51,17 @@ class Day extends Model {
     public function calcGeneralExtra() {
         $total = 0;
         foreach ($this->people as $person)
-            foreach($person->line_items as $item)
-                if ($item->rateclass->code === 'GE')
-                    $total += $item->qty;
+            if ($person->rateclass->code === 'GE')
+                $total += $person->qty;
                     
-                    return $total;
+        return $total;
     }
     
     public function calcBackground() {
         $total = 0;
         foreach ($this->people as $person)
-            foreach($person->line_items as $item)
-                if ($item->rateclass->category->name === 'Background')
-                    $total += $item->qty;
+            if ($person->rateclass->category->name === 'Background')
+                $total += $person->qty;
                 
         return $total;
     }
@@ -69,8 +69,7 @@ class Day extends Model {
     public function calcTotalAmount() {
         $total = 0;
         foreach ($this->people as $person)
-            foreach($person->line_items as $item)
-                $total += $item->calcAmount();
+            $total += $person->calcAmount();
             
         return $total;
     }

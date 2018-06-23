@@ -7,7 +7,7 @@
 @section('content')
 <div class="small">
 	<a href="{{ route('home') }}"><strong>Home</strong></a>
-	&gt; <a href="{{ route('shows.edit', $entry->show_id) }}"><strong>{{ $entry->show->name }}</strong></a>
+	&gt; <a href="{{ route('productions.edit', $entry->production_id) }}"><strong>{{ $entry->production->name }}</strong></a>
 	&gt; {{ isset($entry->id) ? 'Modify an Existing' : 'Create a New' }} Budget
 </div>
 <div class="panel panel-primary">
@@ -18,15 +18,23 @@
 		'class' => 'form-horizontal']) }}    
 
     	<div class="form-group">
-    		{{ Form::label('', 'Show:', ['class' => 'col-md-3 control-label']) }}
-    		<div class="col-md-9 form-control-static">{{ $entry->show->name }}</div>
+    		{{ Form::label('', 'Production Name:', ['class' => 'col-md-3 control-label']) }}
+    		<div class="col-md-9 form-control-static">{{ $entry->production->name }}</div>
     	</div>
 
 	<div class="form-group @if ($errors->has('name')) has-error @endif">
-		{{ Form::labelRequired('name', 'Name:', ['class' => 'col-md-3 control-label']) }}
+		{{ Form::labelRequired('name', 'Script Name:', ['class' => 'col-md-3 control-label']) }}
 		<div class="col-md-9">
 		{{ Form::text('name', $value = null, ['class' => 'form-control']) }}
 		@if ($errors->has('name')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
+		</div>
+	</div>
+
+	<div class="form-group @if ($errors->has('episode')) has-error @endif">
+		{{ Form::label('episode', 'Episode:', ['class' => 'col-md-3 control-label']) }}
+		<div class="col-md-3">
+		{{ Form::text('episode', $value = null, ['class' => 'form-control']) }}
+		@if ($errors->has('episode')) <p class="help-block">{{ $errors->first('episode') }}</p> @endif
 		</div>
 	</div>
 
@@ -39,7 +47,7 @@
 	</div>
 
 	<div class="form-group @if ($errors->has('startdate')) has-error @endif">
-		{{ Form::labelRequired('startdate', 'Start Date:', ['class' => 'col-md-3 control-label']) }}
+		{{ Form::labelRequired('startdate', 'Shoot Day 1:', ['class' => 'col-md-3 control-label']) }}
 		<div class="col-md-3">
         <div class="input-group date" data-provide="datepicker">
 			{{ Form::text('startdate', $entry->startdate, ['class' => 'form-control']) }}
@@ -52,7 +60,7 @@
 	</div>
 
 	<div class="form-group @if ($errors->has('enddate')) has-error @endif">
-		{{ Form::labelRequired('', 'Auto-create Until:', ['class' => 'col-md-3 control-label']) }}
+		{{ Form::labelRequired('', 'Shoot End Date OR # of Shoot Days:', ['class' => 'col-md-3 control-label']) }}
 		<div class="col-md-9 form-inline">
 			@isset ($entry->id)
         		<div class="alert alert-info">
@@ -103,7 +111,7 @@
 
 	<div class="form-group">
 	<div class="col-md-offset-3 col-md-9">
-	{{ Form::hidden('show_id') }}
+	{{ Form::hidden('production_id') }}
 	{{ Form::submit('Save Changes', ['class' => 'btn btn-primary']) }}
 	</div>
 	</div>

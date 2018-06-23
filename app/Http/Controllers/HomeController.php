@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Show;
+use App\Production;
 
 class HomeController extends Controller {
     /**
@@ -20,7 +20,7 @@ class HomeController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $list = Show::all()->sortBy('updated_at desc, name');
+        $list = Production::all()->sortBy('name');
         return view('home', ['list' => $list]);
     }
     

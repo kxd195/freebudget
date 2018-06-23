@@ -17,13 +17,13 @@ Route::get('/settings', 'HomeController@settings')->name('settings');
 
 Route::resource('global_settings', 'GlobalSettingController');
 Route::resource('categories', 'CategoryController');
+Route::resource('scenes', 'SceneController');
 Route::resource('units', 'UnitController');
 Route::resource('rate_classes', 'RateClassController');
-Route::resource('shows', 'ShowController');
+Route::resource('productions', 'ProductionController');
 Route::resource('budgets', 'BudgetController');
 Route::resource('days', 'DayController');
 Route::resource('people', 'PersonController');
-Route::post('scene/edit/{budget_id}', 'PersonController@updateWholeScene')->name('scene.edit');
 Route::post('budgets/{id}/tag', 'BudgetController@tagVersion')->name('budgets.tag');
 Route::get('budgets/{id}/version/{version}', 'BudgetController@showVersion')->name('budgets.version');
 Route::resource('shares', 'ShareController');

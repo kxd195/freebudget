@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Budget;
+use App\Day;
 use App\Unit;
 use App\BudgetVersion;
 
@@ -64,6 +65,15 @@ class BudgetController extends Controller {
         $budget = Budget::findOrFail($id);
         $budget->days = $budget->days->sortBy('actualdate');
 
+        $undated_day = new Day();
+        $undated_day->id = 0;
+        $undated_day->budget_id = $budget->id;
+        $undated_day->name = "Additional Entries";
+        $undated_day->actualdate = "9999-01-01 00:00:00";
+        $undated_day->people = $budget->undated_entries;
+        
+        $budget->days->push($undated_day);
+
         // add the day name and actualdate to a new column called display_name
         $budget->days->map(function($i) {
             $i['display_name'] = $i->generateName();
@@ -80,13 +90,8 @@ class BudgetController extends Controller {
         }
         
         $units = Unit::all();
-        $scenes = $budget->getScenes();
-        $printer_friendly = $request->get('pf');
 
-        if ($printer_friendly)
-            return view('budgets.print', ['budget' => $budget, 'units' => $units, 'days' => $days, 'scenes' => $scenes, 'from_share' => $from_share, 'readonly' => $read_only]);
-
-        return view('budgets.show', ['budget' => $budget, 'units' => $units, 'days' => $days, 'scenes' => $scenes, 'from_share' => $from_share, 'readonly' => $read_only]);
+        return view('budgets.show', ['budget' => $budget, 'units' => $units, 'days' => $days, 'from_share' => $from_share, 'readonly' => $read_only]);
     }
     
     public function showVersion($id, $version, $from_share = false) {
@@ -116,8 +121,8 @@ class BudgetController extends Controller {
     public function edit($id) {
         $entry = $id !== 0 ? Budget::findOrFail($id) : new Budget();
         
-        if (intval(request()->get('show_id')) !== 0)
-            $entry->show_id = intval(request()->get('show_id'));
+        if (intval(request()->get('production_id')) !== 0)
+            $entry->production_id = intval(request()->get('production_id'));
         
         return view('budgets.edit', ['entry' => $entry]);
     }
