@@ -4,7 +4,7 @@
 @component('components.messages')
 @endcomponent
 
-<div class="small">
+<div>
 	<a href="{{ route('home') }}"><strong>Home</strong></a>
 	&gt; <a href="{{ route('settings') }}"><strong>System Settings</strong></a>
 	&gt; Rate Class Categories

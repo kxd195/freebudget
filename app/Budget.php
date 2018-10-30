@@ -14,7 +14,7 @@ class Budget extends Model {
     use VersionableTrait;
     use FormAccessible;
     
-    protected $fillable = ['production_id', 'name', 'description', 'episode', 'startdate', 'enddate', 'num_days', 'notes'];
+    protected $fillable = ['production_id', 'name', 'episode', 'startdate', 'enddate', 'num_days'];
     protected $touches = ['production'];
     protected $dates = ['startdate', 'enddate'];
     
@@ -61,8 +61,21 @@ class Budget extends Model {
                     $newDay->save();
                     
                     // if it's the start of a new week, add the assistant entry
-                    if ($dayOfWeek === Carbon::MONDAY)
-                        Person::createPersonFromRateClass($this->id, $newDay->id, $mainUnit->id, 'AS', $this->production->assistant_rate);
+                    if ($this->assistant_rate_unit === "week") {
+                        if ($dayOfWeek === Carbon::MONDAY)
+                            Person::createPersonFromRateClass($this->id, $newDay->id, $mainUnit->id, 'AS', $this->production->assistant_rate);
+                    } else {
+                        // hourly assistant specified
+                        if (($dayOfWeek === Carbon::SUNDAY && $this->production->asst_sun)
+                                || ($dayOfWeek === Carbon::MONDAY && $this->production->asst_mon)
+                                || ($dayOfWeek === Carbon::TUESDAY && $this->production->asst_tue)
+                                || ($dayOfWeek === Carbon::WEDNESDAY && $this->production->asst_wed)
+                                || ($dayOfWeek === Carbon::THURSDAY && $this->production->asst_thu)
+                                || ($dayOfWeek === Carbon::FRIDAY && $this->production->asst_fri)
+                                || ($dayOfWeek === Carbon::SATURDAY && $this->production->asst_sat))
+                            Person::createPersonFromRateClass($this->id, $newDay->id, $mainUnit->id, 'AS', $this->production->assistant_rate, 8);
+
+                    }
 
                     // ad a wrangler entry for each day
                     // Person::createPersonFromRateClass($newDay->id, $mainUnit->id, 'WR', $this->production->wrangler_rate, 8);

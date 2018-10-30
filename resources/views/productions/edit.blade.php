@@ -1,16 +1,20 @@
 @extends('layouts.app')
 
 @section('scripts')
+<script type="text/javascript" src="{{ asset('js/jquery.matchHeight-min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/productions.edit.js') }}"></script>
 @endsection
 
 @section('content')
-<div class="small">
+<div>
 	<a href="{{ route('home') }}"><strong>Home</strong></a>
-	&gt; {{ $entry->name or 'Create New Production' }} 
+	&gt; {{ $entry->name or 'Create a Production' }} 
 </div>
+
+<div class="row">
+<div class="col-md-10">
 <div class="panel panel-primary">
-    <div class="panel-heading"><h1 class="panel-title">{{ $entry->name or 'Create New Production' }}</h1></div>
+    <div class="panel-heading"><h1 class="panel-title">{{ $entry->name or 'Create a Production' }}</h1></div>
     <div class="panel-body">
 	{{ Form::model($entry, [
 		'route' => isset($entry->id) ? ['productions.update', $entry->id] : 'productions.store', 
@@ -82,48 +86,6 @@
 		</div>
 		</div>
 	</div>
-	
-    	<div class="form-group @if ($errors->has('assistant_rate')) has-error @endif">
-    		{{ Form::label('assistant_rate', 'Assistant Rate:', ['class' => 'col-md-3 control-label']) }}
-    		<div class="col-md-3">
-    		<div class="input-group">
-        		<span class="input-group-addon">$</span>
-        		{{ Form::text('assistant_rate', $value = null, 
-        			['class' => 'form-control text-right',
-            		'data-mask' => '000,000,000,000,000.00', 'data-mask-reverse' => 'true']) }}
-        		<span class="input-group-addon">per week</span>
-    		</div>
-    		</div>
-        	@if ($errors->has('assistant_rate')) <p class="help-block">{{ $errors->first('assistant_rate') }}</p> @endif
-    	</div>
-
-    	<div class="form-group @if ($errors->has('wrangler_rate')) has-error @endif">
-    		{{ Form::label('wrangler_rate', 'Key Wrangler Rate:', ['class' => 'col-md-3 control-label']) }}
-    		<div class="col-md-3">
-    		<div class="input-group">
-        		<span class="input-group-addon">$</span>
-        		{{ Form::text('wrangler_rate', $value = null, 
-        			['class' => 'form-control text-right',
-            		'data-mask' => '000,000,000,000,000.00', 'data-mask-reverse' => 'true']) }}
-        		<span class="input-group-addon">per hour</span>
-    		</div>
-    		</div>
-        	@if ($errors->has('wrangler_rate')) <p class="help-block">{{ $errors->first('wrangler_rate') }}</p> @endif
-    	</div>
-
-    	<div class="form-group @if ($errors->has('wrangler_addl_rate')) has-error @endif">
-    		{{ Form::label('wrangler_addl_rate', 'Addl. Wrangler Rate:', ['class' => 'col-md-3 control-label']) }}
-    		<div class="col-md-3">
-    		<div class="input-group">
-        		<span class="input-group-addon">$</span>
-        		{{ Form::text('wrangler_addl_rate', $value = null, 
-        			['class' => 'form-control text-right',
-            		'data-mask' => '000,000,000,000,000.00', 'data-mask-reverse' => 'true']) }}
-        		<span class="input-group-addon">per hour</span>
-    		</div>
-    		</div>
-        	@if ($errors->has('wrangler_addl_rate')) <p class="help-block">{{ $errors->first('wrangler_addl_rate') }}</p> @endif
-    	</div>
 
 	<div class="form-group @if ($errors->has('num_union')) has-error @endif">
 		{{ Form::label('num_union', 'Daily Union Requirements:', ['class' => 'col-md-3 control-label']) }}
@@ -131,6 +93,102 @@
 		{{ Form::number('num_union', $value = 0, ['class' => 'form-control', 'step' => 'any', 'min' => 0]) }}
 		</div>
 		@if ($errors->has('num_union')) <p class="help-block">{{ $errors->first('num_union') }}</p> @endif
+	</div>
+
+	<div id="pane-suboptions" class="form-group">
+		<div class="col-md-7">
+		<div class="panel panel-info">
+			<div class="panel-heading">Assistants</div>
+			<div class="panel-body">
+				<div class="form-group @if ($errors->has('assistant_rate')) has-error @endif">
+					{{ Form::label('assistant_rate', 'Assistant Rate:', ['class' => 'col-md-4 control-label']) }}
+					<div class="col-xs-3">
+						<div class="input-group">
+							<span class="input-group-addon">$</span>
+							{{ Form::text('assistant_rate', $value = null, 
+								['class' => 'form-control text-right',
+					    		'data-mask' => '000,000,000,000,000.00', 'data-mask-reverse' => 'true']) }}
+						</div>
+					</div>
+					<div class="col-xs-3"> 
+						{{ Form::select('assistant_rate_unit', ['week' => 'per week', 'hour' => 'per hour'] , $value = null, ['class' => 'form-control', 'id' => 'assistant_rate_unit', 'onchange' => 'toggleAssistantOptions();']) }}
+					</div>
+					@if ($errors->has('assistant_rate')) <p class="help-block">{{ $errors->first('assistant_rate') }}</p> @endif
+				</div>
+
+				<div id="pane-assistant-schedule" class="form-group">
+					{{ Form::label('', 'Work Week Schedule:', ['class' => 'col-md-4 control-label']) }}
+					<div class="col-md-8 form-inline">
+					<div class="checkbox">
+					<label style="margin-right:10px;">
+					{{ Form::checkbox('asst_sun', '1') }}
+					Sun
+					</label>
+					<label style="margin-right:10px;">
+					{{ Form::checkbox('asst_mon', '1') }}
+					Mon
+					</label>
+					<label style="margin-right:10px;">
+					{{ Form::checkbox('asst_tue', '1') }}
+					Tue
+					</label>
+					<label style="margin-right:10px;">
+					{{ Form::checkbox('asst_wed', '1') }}
+					Wed
+					</label>
+					<label style="margin-right:10px;">
+					{{ Form::checkbox('asst_thu', '1') }}
+					Thu
+					</label>
+					<label style="margin-right:10px;">
+					{{ Form::checkbox('asst_fri', '1') }}
+					Fri
+					</label>
+					<label style="margin-right:10px;">
+					{{ Form::checkbox('asst_sat', '1') }}
+					Sat
+					</label>
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		</div>
+
+	 	<div class="col-md-5">
+		<div class="panel panel-info">
+			<div class="panel-heading">Wranglers</div>
+			<div class="panel-body">
+				<div class="form-group @if ($errors->has('wrangler_rate')) has-error @endif">
+					{{ Form::label('wrangler_rate', 'Key Wrangler Rate:', ['class' => 'col-md-5 control-label']) }}
+					<div class="col-md-5">
+					<div class="input-group">
+						<span class="input-group-addon">$</span>
+						{{ Form::text('wrangler_rate', $value = null, 
+							['class' => 'form-control text-right',
+				    		'data-mask' => '000,000,000,000,000.00', 'data-mask-reverse' => 'true']) }}
+						<span class="input-group-addon">per hour</span>
+					</div>
+					</div>
+					@if ($errors->has('wrangler_rate')) <p class="help-block">{{ $errors->first('wrangler_rate') }}</p> @endif
+				</div>
+
+				<div class="form-group @if ($errors->has('wrangler_addl_rate')) has-error @endif">
+					{{ Form::label('wrangler_addl_rate', 'Addl. Wrangler Rate:', ['class' => 'col-md-5 control-label']) }}
+					<div class="col-md-5">
+					<div class="input-group">
+						<span class="input-group-addon">$</span>
+						{{ Form::text('wrangler_addl_rate', $value = null, 
+							['class' => 'form-control text-right',
+				    		'data-mask' => '000,000,000,000,000.00', 'data-mask-reverse' => 'true']) }}
+						<span class="input-group-addon">per hour</span>
+					</div>
+					</div>
+					@if ($errors->has('wrangler_addl_rate')) <p class="help-block">{{ $errors->first('wrangler_addl_rate') }}</p> @endif
+				</div>
+    		</div>
+		</div>
+		</div>
 	</div>
 
 
@@ -145,25 +203,27 @@
 	
 	@component('components.delete', ['entry' => $entry, 'controller' => 'productions', 'caption' => 'Delete Production'])
 	@endcomponent
-
-	@if (isset($entry->id))	
-	<hr role="separator" />
-
-	<div class="form form-horizontal">
-	<div class="form-group">
-		{{ Form::label('', 'Budgets', ['class' => 'col-md-3 control-label']) }}
-		<div class="col-md-9 form-control-static">
-		<ul>
-			@foreach ($entry->budgets as $budget)
-				<li><a href="{{ route('budgets.show', $budget->id) }}">{{ $budget->name }}</a></li>
-			@endforeach
-			<li><a href="{{ route('budgets.create', ['production_id' => $entry->id]) }}"><em>Create a New Budget</em></a></li>
-		</ul>
-		</div>
-	</div>
-	</div>
-	@endif
-	
     </div>
+</div>
+</div>
+
+@isset($entry->id)
+<div class="col-md-2">
+<div class="panel panel-primary">
+	<div class="panel-heading">Budgets</div>
+	<div class="panel-body form form-horizontal">
+
+	<ul>
+		@foreach ($entry->budgets as $budget)
+			<li><a href="{{ route('budgets.show', $budget->id) }}">{{ $budget->name }}</a></li>
+		@endforeach
+	</ul>
+
+	<a href="{{ route('budgets.create', ['production_id' => $entry->id]) }}" class="btn btn-block btn-warning">Create a New Budget</a>
+	</div>
+	</div>
+</div>
+</div>
+@endisset
 </div>
 @endsection

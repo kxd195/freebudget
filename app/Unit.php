@@ -8,9 +8,17 @@ class Unit extends Model {
     protected $fillable = ['name'];
     
     public function people($days) {
-        return is_int($days) 
-                ? $this->hasMany('App\Person')->where('day_id', '=', $days)->get()
-                : $this->hasMany('App\Person')->whereIn('day_id', $days->pluck('id'))->get();
+        return $this->hasMany('App\Person')
+            ->select('people.*', 'rate_classes.code', 'scenes.name')
+            ->leftJoin('rate_classes', 'people.rate_class_id', '=', 'rate_classes.id')
+            ->leftJoin('scenes', 'people.scene_id', '=', 'scenes.id')
+            ->where('day_id', '=', $days)
+            ->orderByRaw("CASE 
+                WHEN rate_classes.code='SI' THEN CONCAT('AAA', rate_classes.code)
+                WHEN rate_classes.code='AS' THEN CONCAT('BBB', rate_classes.code)
+                WHEN rate_classes.code='WR' THEN CONCAT('ZZZ', rate_classes.code)
+                ELSE CONCAT(scenes.name, rate_classes.code) END")
+            ->get();
     }
     
     public function calcTotalAmount($days) {

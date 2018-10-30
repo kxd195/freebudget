@@ -5,7 +5,10 @@
 @endsection
 
 @section('content')
-<div class="small">
+@component('components.messages')
+@endcomponent
+
+<div>
 	<a href="{{ route('home') }}"><strong>Home</strong></a>
 	&gt; <a href="{{ route('productions.edit', $entry->production_id) }}"><strong>{{ $entry->production->name }}</strong></a>
 	&gt; {{ isset($entry->id) ? 'Modify an Existing' : 'Create a New' }} Budget
@@ -35,14 +38,6 @@
 		<div class="col-md-3">
 		{{ Form::text('episode', $value = null, ['class' => 'form-control']) }}
 		@if ($errors->has('episode')) <p class="help-block">{{ $errors->first('episode') }}</p> @endif
-		</div>
-	</div>
-
-	<div class="form-group @if ($errors->has('description')) has-error @endif">
-		{{ Form::label('description', 'Description:', ['class' => 'col-md-3 control-label']) }}
-		<div class="col-md-9">
-		{{ Form::textarea('description', $value = null, ['class' => 'form-control', 'rows' => 4]) }}
-		@if ($errors->has('description')) <p class="help-block">{{ $errors->first('description') }}</p> @endif
 		</div>
 	</div>
 
@@ -98,14 +93,6 @@
         		</div>
         		</div>
         		
-		</div>
-	</div>
-
-	<div class="form-group @if ($errors->has('notes')) has-error @endif">
-		{{ Form::label('notes', 'Notes:', ['class' => 'col-md-3 control-label']) }}
-		<div class="col-md-9">
-		{{ Form::textarea('notes', $value = null, ['class' => 'form-control', 'rows' => 4]) }}
-		@if ($errors->has('notes')) <p class="help-block">{{ $errors->first('notes') }}</p> @endif
 		</div>
 	</div>
 

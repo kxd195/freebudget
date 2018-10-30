@@ -36,7 +36,7 @@
 	   			{{ Form::number('expires_after', 0, ['class' => 'form-control', 'min' => 0]) }}
    				<span class="input-group-addon">days</span>
    			</div>
-   			<p class="help-block small">Use "0 days" for indefinite</p>
+   			<p class="help-block">Use "0 days" for indefinite</p>
    			</div>
    		</div>
     </div>

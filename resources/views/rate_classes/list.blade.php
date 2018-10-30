@@ -4,7 +4,7 @@
 @component('components.messages')
 @endcomponent
 
-<div class="small">
+<div>
 	<a href="{{ route('home') }}"><strong>Home</strong></a>
 	&gt; <a href="{{ route('settings') }}"><strong>System Settings</strong></a>
 	&gt; Rate Classes
@@ -35,7 +35,7 @@
         				<a href="{{ route('rate_classes.edit', $item->id) }}">{{ $item->name }}</a>
         			</td>
         			<td headers="col_code" class="text-center">{{ $item->code }}</td>
-        			<td headers="col_min_hours" class="text-right">{{ $item->min_hours }}</td>
+        			<td headers="col_min_hours" class="text-right">{{ $item->is_daily ? 'Daily' : $item->min_hours }}</td>
         			<td headers="col_rate" class="text-right">$ {{ $item->rate }}</td>
         		</tr>
         	@endforeach

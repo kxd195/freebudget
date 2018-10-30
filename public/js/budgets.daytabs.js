@@ -3,8 +3,8 @@ $(function() {
 	
 	$("#tagVersionModal").on("shown.bs.modal", function () {
 		$("#tagVersionModal :input:first").focus();
-	})
-	
+	});
+
 	$("#shareCreateButton").on("click", createShare);
 	initShareClipboard();
 	
@@ -16,6 +16,7 @@ $(function() {
 
 		// set the selects according to the modify button clicked
 		modal.find("#scene-name").val(button.data("scene-name")).focus();
+		modal.find("#episode").val(button.data("episode"));
 		modal.find("#location").val(button.data("location"));
 		modal.find("#description").val(button.data("description"));
 		modal.find("#notes").val(button.data("notes"));
@@ -40,10 +41,10 @@ function dayQuickjump() {
 	var day_id = $("#day-quickjump").val();
 	
 	if (day_id === "ALL")
-		$("#dayTable tbody[data-day-id]").show();
+		$("[id^='dayTable']").show();
 	else {
-		$("#dayTable tbody[data-day-id='" + day_id +"']").show();
-		$("#dayTable tbody[data-day-id!='" + day_id +"']").hide();
+		$("#dayTable-" + day_id).show();
+		$("[id^='dayTable']").not("#dayTable-" + day_id).hide();
 	}
 
 	calcTotals();
@@ -51,13 +52,25 @@ function dayQuickjump() {
 
 function calcTotals() {
 	var grandTotal = 0;
-	$("#dayTable tbody[data-day-id]:visible td[headers='amount_col'].line-item-amount").each(function() {
+	$("table[id^='dayTable']:visible td[headers='amount_col'].line-item-amount").each(function() {
 		grandTotal += parseAmount($(this).html());
 	});
 
 	$("#grandTotal").html(grandTotal.formatMoney(2));
 }
 
+function confirmDeleteSelected(obj) {
+	$("#deleteForm input[name^='delete_entry_id']").remove();
+
+	if (confirm('Are you sure you would like to delete the selected entries?')) {
+		var checkboxes = $("input[name^='delete_entry_id']:checked").clone();
+		$(checkboxes).hide();
+		$("#deleteForm").append(checkboxes);
+		return true;
+	}
+
+	return false;
+}
 
 function createShare() {
 	var CSRF_TOKEN = $("meta[name='csrf-token']").attr("content");

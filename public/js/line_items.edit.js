@@ -1,5 +1,6 @@
 $(function() {
 	refreshMinHoursTooltip();
+	toggleDailyEntries();
 	
 	$("[id^='qty'], [id^='hours'], [id^='cost']").on("keyup mouseup change", function() {
 		recalculate(this);
@@ -13,8 +14,41 @@ $(function() {
 		$("#addRowButton").click();
 
 	$.fn.select2.defaults.set("theme", "bootstrap");
-	$("[id^='rate_class_id']:visible").select2();
+	$("[id^='rate_class_id']:visible, #scene_id").select2({
+		matcher : rateClassMatcher
+	});
 });
+
+function rateClassMatcher(params, data) {
+	// If there are no search terms, return all of the data
+	if ($.trim(params.term) === '')
+		return data;
+
+	// Skip if there is no 'children' property
+	if (typeof data.children === 'undefined')
+		return null;
+
+	// `data.children` contains the actual options that we are matching against
+	var filteredChildren = [];
+	$.each(data.children, function (idx, child) {
+		if ($.trim(child.text).toUpperCase().indexOf(params.term.toUpperCase()) >= 0)
+			filteredChildren.push(child);
+	});
+
+	// If we matched any of the timezone group's children, then set the matched children on the group
+	// and return the group object
+	if (filteredChildren.length) {
+		var modifiedData = $.extend({}, data, true);
+		modifiedData.children = filteredChildren;
+
+		// You can return modified objects from here
+		// This includes matching the `children` how you want in nested data sets
+		return modifiedData;
+	}
+
+	// Return `null` if the term should not be displayed
+	return null;
+}
 
 function preSubmit() {
 	$("[name$='[cost]']:visible").each(function() {
@@ -130,6 +164,23 @@ function toggleCost(obj) {
 		recalculate(obj);
 }
 
+function toggleDailyEntries() {
+	$("[id^='rate_class_id_']:visible").each(function() {
+		var iteration = $(this).attr("id").replace(/[\D]/gi, "");
+		var rate_class_is_daily = $(this).find("option:selected").data("daily");
+
+		if (rate_class_is_daily) {
+			$("#hours_" + iteration + ", #payroll_" + iteration)
+				.val("Daily")
+				.attr("disabled", true);
+		} else {
+			$("#hours_" + iteration + ", #payroll_" + iteration)
+				.attr("disabled", false);
+		}
+	});
+
+}
+
 function loadFromRateClass(obj) {
 	var iteration = $(obj).attr("id").replace(/[\D]/gi, "");
 	var rate_class_default = parseFloat($("#rate_class_id_" + iteration + " option:selected").data("rate"));
@@ -140,23 +191,24 @@ function loadFromRateClass(obj) {
 	
 	$("#hours_" + iteration).prop("min" , rate_class_min_hours);
 	refreshMinHoursTooltip(iteration);
-	
+	toggleDailyEntries();
+
 	// only set the hours if min_hours is specified
 	if (rate_class_min_hours > 0 && curr_hours < rate_class_min_hours)
 		$("#hours_" + iteration).val(rate_class_min_hours.toFixed(1));
 	
 	// only set the rate if it's not overridden or it's the rate-class triggering this
 	if (!cost_override || $(obj).is("#rate_class_id_" + iteration)) {
-		var no_default_set = rate_class_default === 0;
+		var default_rate_set = rate_class_default > 0;
 
-		if (!no_default_set || curr_cost === 0)
+		if (default_rate_set)
 			$("#cost_" + iteration).val(rate_class_default.toFixed(2));
 	
 		// if no default rate specified, automatically allow rate entry
-		$("#cost_overridden_" + iteration).prop("checked", no_default_set);
+		$("#cost_overridden_" + iteration).prop("checked", !default_rate_set);
 		$("#cost_secondrate_" + iteration).prop("checked", false);
 
-		$("#cost_" + iteration).prop("readonly", !no_default_set);
+		$("#cost_" + iteration).prop("readonly", default_rate_set);
 	}
 }
 
@@ -167,20 +219,29 @@ function recalculate(obj) {
 	if ($(obj).is("#rate_class_id_" + iteration) || $(obj).is("#cost_overridden_" + iteration))
 		loadFromRateClass(obj);
 
+	if ($(obj).is("#qty_" + iteration) && $(obj).val() === "0") {
+		$("#rate_class_id_" + iteration).attr("selectedIndex", 0);
+		$("#description_" + iteration).val("No BG");
+		$("#hours_" + iteration).val(0);
+	}
+
 	var isAddon = $("#rate_class_id_" + iteration + " option:selected").data("addon") === 1;
 	showHide($(obj).closest("tr").find(".quick-action-buttons"), !isAddon);
 
-	var hours = isNaN($("#hours_" + iteration).val()) || $("#hours_" + iteration).val().length === 0 ? 0 : parseInt($("#hours_" + iteration).val(), 10);
+	var hours = isNaN($("#hours_" + iteration).val()) || $("#hours_" + iteration).val().length === 0 ? 1 : parseInt($("#hours_" + iteration).val(), 10);
 	var url = CONTEXT_PATH + "/api/calcPayroll/" + hours;
 	
 	$.getJSON(url, function(jsonObj) {
-		$("#payroll_" + iteration).val(jsonObj.result);
+		var rate_class_is_daily = $("#rate_class_id_" + iteration + " option:selected").data("daily");
+
+		$("#payroll_" + iteration).val(rate_class_is_daily ? 'Daily' : jsonObj.result);
+		$("#payroll_" + iteration).attr("disabled", rate_class_is_daily);
 		
 		var qty = parseInt($("#qty_" + iteration).val(), 10);
 		var payroll = parseFloat($("#payroll_" + iteration).val(), 10);
 		var cost = parseAmount($("#cost_" + iteration).val());
 
-		$("#amount_" + iteration).val((qty * payroll * cost).toFixed(2));
+		$("#amount_" + iteration).val((qty * (isNaN(payroll) ? 1 : payroll) * cost).toFixed(2));
 	});
 
 }
@@ -193,7 +254,7 @@ function calcSecondCategory() {
 		var iteration = $(this).attr("id").replace(/[\D]/gi, "");
 		var curr_cost = parseFloat($(this).val());
 		
-		if (parseInt($("#rate_class_id_" + iteration + " option:selected").data("addon"), 10) === 0) {
+		if (! $("#rate_class_id_" + iteration + " option:selected").data("addon")) {
 			if (highest_cost < curr_cost) {
 				highest_cost = curr_cost;
 				highest_cost_row = iteration;
@@ -205,8 +266,7 @@ function calcSecondCategory() {
 		var iteration = $(this).attr("id").replace(/[\D]/gi, "");
 		var curr_cost = parseFloat($(this).val());
 		
-		if (parseInt($("#rate_class_id_" + iteration + " option:selected").data("addon"), 10) === 0
-				&& iteration !== highest_cost_row) {
+		if (! $("#rate_class_id_" + iteration + " option:selected").data("addon") && iteration !== highest_cost_row) {
 			if (highest_cost > curr_cost) {
 				$(this)
 					.data("original-cost", curr_cost)

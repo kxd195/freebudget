@@ -12,7 +12,9 @@ class Production extends Model {
     
     protected $fillable = ['name', 'type', 'qty', 'season',
         'work_sun', 'work_mon', 'work_tue', 'work_wed', 'work_thu', 'work_fri', 'work_sat',
-        'assistant_rate', 'wrangler_rate', 'wrangler_addl_rate', 'num_union'
+        'assistant_rate', 'assistant_rate_unit',
+        'asst_sun', 'asst_mon', 'asst_tue', 'asst_wed', 'asst_thu', 'asst_fri', 'asst_sat',
+        'wrangler_rate', 'wrangler_addl_rate', 'num_union'
     ];
 
     const TYPE_SERIES = 'TV Series';

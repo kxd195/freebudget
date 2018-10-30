@@ -8,7 +8,7 @@ var existingDays = [ @foreach ($entry->budget->days as $day) "{{ $day->actualdat
 @endsection
 
 @section('content')
-<div class="small">
+<div>
 	<a href="{{ route('home') }}"><strong>Home</strong></a>
 	&gt; <a href="{{ route('productions.edit', $entry->budget->production_id) }}"><strong>{{ $entry->budget->production->name }}</strong></a>
 	&gt; <a href="{{ route('budgets.show', ['id' => $entry->budget_id]) }}"><strong>{{ $entry->budget->name }}</strong></a>
@@ -62,6 +62,14 @@ var existingDays = [ @foreach ($entry->budget->days as $day) "{{ $day->actualdat
 		</div>
 	</div>
     
+	<div class="form-group @if ($errors->has('location')) has-error @endif">
+		{{ Form::label('location', 'Location(s):', ['class' => 'col-md-3 control-label']) }}
+		<div class="col-md-9">
+		{{ Form::text('location', $entry->location, ['class' => 'form-control']) }}
+		@if ($errors->has('location')) <p class="help-block">{{ $errors->first('location') }}</p> @endif
+		</div>
+	</div>
+
 	<div class="form-group @if ($errors->has('notes')) has-error @endif">
 		{{ Form::label('notes', 'Notes:', ['class' => 'col-md-3 control-label']) }}
 		<div class="col-md-9">

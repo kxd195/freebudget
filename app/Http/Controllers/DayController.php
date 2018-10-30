@@ -85,7 +85,10 @@ class DayController extends Controller {
     public function update(Request $request, $id) {
         $this->run_validation($request);
         
-        $existing_day = Day::where('actualdate', $request->get('actualdate'))->first();
+        $existing_day = Day::where([
+            ['budget_id', $request->get('budget_id')],
+            ['actualdate', $request->get('actualdate')]
+        ])->first();
         
         // conflict found, moving all person entries to new date
         if (isset($existing_day) && ($existing_day->id != $id || $id == 0)) {
@@ -120,9 +123,9 @@ class DayController extends Controller {
         
         // $this->renameDays($showBudgetId);
 
-        return redirect()->route('budgets.show', $showBudgetId)
-                ->with('show_day_id', $showDayId)
+        return redirect()->to(route('budgets.show', $showBudgetId) . '#day-' . $showDayId)
                 ->with('message', 'Your changes has been successfully saved!');
+
     }
 
     /**

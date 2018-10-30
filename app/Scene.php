@@ -10,7 +10,7 @@ class Scene extends Model {
 	use SoftDeletes;
 	use VersionableTrait;
 
-	protected $fillable = ['budget_id', 'name', 'description', 'location', 'notes'];
+	protected $fillable = ['budget_id', 'episode', 'name', 'description', 'location', 'notes'];
 	protected $touches = ['budget'];
 
 	public function Budget() {

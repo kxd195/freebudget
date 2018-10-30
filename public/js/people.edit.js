@@ -10,6 +10,7 @@ function toggleScene(obj) {
 
 	if ($(obj).is("select") || obj == null) {
 		var scene = $("#scene_id").find("option:selected");
+		$("#scene-existing-episode").html (scene.data("episode") );
 		$("#scene-existing-name").html( scene.text() );
 		$("#scene-existing-location").html( scene.data("location") );
 		$("#scene-existing-description").html( scene.data("description") );

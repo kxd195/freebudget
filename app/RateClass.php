@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RateClass extends Model {
     use SoftDeletes;
-    protected $fillable = ['category_id', 'name', 'code', 'min_hours', 'rate', 'bgcolor', 'is_addon'];
+    protected $fillable = ['category_id', 'name', 'code', 'min_hours', 'rate', 'bgcolor', 'is_addon', 'is_daily'];
     public static $bgcolors = [
         'none' => 'None',
         'bg-red' => 'Red',

@@ -7,6 +7,7 @@ use App\Budget;
 use App\Day;
 use App\Unit;
 use App\BudgetVersion;
+use Carbon\Carbon;
 
 class BudgetController extends Controller {
     public function __construct() {
@@ -65,15 +66,6 @@ class BudgetController extends Controller {
         $budget = Budget::findOrFail($id);
         $budget->days = $budget->days->sortBy('actualdate');
 
-        $undated_day = new Day();
-        $undated_day->id = 0;
-        $undated_day->budget_id = $budget->id;
-        $undated_day->name = "Additional Entries";
-        $undated_day->actualdate = "9999-01-01 00:00:00";
-        $undated_day->people = $budget->undated_entries;
-        
-        $budget->days->push($undated_day);
-
         // add the day name and actualdate to a new column called display_name
         $budget->days->map(function($i) {
             $i['display_name'] = $i->generateName();
@@ -81,17 +73,8 @@ class BudgetController extends Controller {
         });
             
         $days = $budget->days->pluck('display_name', 'id');
-            
-        foreach ($budget->days as $day) {
-            $day->people = $day->people->sortBy(function($i) { 
-                return strtoupper($i->unit->name . '-' . $i->scene . '-' . $i->description);
-            }); 
-            
-        }
-        
         $units = Unit::all();
-
-        return view('budgets.show', ['budget' => $budget, 'units' => $units, 'days' => $days, 'from_share' => $from_share, 'readonly' => $read_only]);
+        return view('budgets.show', ['budget' => $budget, 'units' => $units, 'days' => $days, 'from_share' => $from_share, 'readonly' => $read_only, 'fullscreen' => true]);
     }
     
     public function showVersion($id, $version, $from_share = false) {
@@ -100,14 +83,6 @@ class BudgetController extends Controller {
         $budget = $budget_version->getBudget();
         $budget->version_info = $budget_version; 
         $budget->days = $budget->days->sortBy('actualdate');
-        
-        foreach ($budget->days as $day) {
-            $day->people = $day->people->sortBy(function($i) {
-                return strtoupper($i->unit->name . '-' . $i->scene . '-' . $i->description);
-            });
-                
-        }
-        
         $units = Unit::all();
         return view('budgets.show', ['budget' => $budget, 'units' => $units, 'from_share' => $from_share, 'readonly' => true]);
     }
@@ -150,12 +125,22 @@ class BudgetController extends Controller {
         }
         
         // only new creations will auto-create days
-        if ($isCreateRequest && isset($entry->startdate) && (isset($entry->enddate) || $entry->num_days > 0)) {
-            $entry->autoCreate();
-        }
-        
+        if ($isCreateRequest) {
+            $newDay = new Day();
+            $newDay->is_default_day = true;
+            $newDay->name = "Additional Entries";
+            $newDay->actualdate = Carbon::createFromDate(9999, 1, 1);
+            $newDay->budget_id = $entry->id;
+            $newDay->disableVersioning();
+            $newDay->save();
+
+            if (isset($entry->startdate) && (isset($entry->enddate) || $entry->num_days > 0)) {
+                $entry->autoCreate();
+            }
+        } 
+
         return redirect()->route('budgets.show', $entry->id)
-                ->with('message', 'Your changes has been successfully saved!');
+               ->with('message', 'Your changes has been successfully saved!');
     }
     
     /**

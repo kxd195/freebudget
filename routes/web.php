@@ -29,6 +29,7 @@ Route::get('budgets/{id}/version/{version}', 'BudgetController@showVersion')->na
 Route::resource('shares', 'ShareController');
 Route::get('$h@r-{id}', 'ShareController@show')->name('shares.external');
 Route::resource('line_items', 'LineItemController');
+Route::post('people/destroy', 'PersonController@delete')->name('people.delete');
 
 Route::get('/', function () {
     return view('welcome');

@@ -5,7 +5,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title">Move/copy to multiple days</h4>
     </div>
-    <div class="modal-body small">
+    <div class="modal-body">
     		<p class="text-success text-center"><strong>**</strong> indicates currently selected day.</p>
     		<div class="form form-horizontal">
         	<div class="form-group @if ($errors->has('day_id')) has-error @endif">

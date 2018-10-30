@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="small">
+<div>
 	<a href="{{ route('home') }}"><strong>Home</strong></a>
 	&gt; System Settings
 </div>

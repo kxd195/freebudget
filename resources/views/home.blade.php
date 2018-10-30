@@ -4,36 +4,63 @@
 @component('components.messages')
 @endcomponent
 
-<div class="small">
-	Home
+        <style>
+            html, body {
+                background-color: #fff;
+                color: #636b6f;
+                font-family: 'Raleway', sans-serif;
+                font-weight: 100;
+                height: 100vh;
+                margin: 0;
+            }
+
+            .full-height {
+                height: 85vh;
+            }
+
+            .flex-center {
+                align-items: center;
+                display: flex;
+                justify-content: center;
+            }
+
+            .position-ref {
+                position: relative;
+            }
+
+            .top-right {
+                position: absolute;
+                right: 10px;
+                top: 18px;
+            }
+
+            .content {
+                text-align: center;
+            }
+
+            .title {
+                font-size: 64px;
+            }
+
+            .links > a {
+                color: #636b6f;
+                padding: 0 25px;
+                font-size: 12px;
+                font-weight: 600;
+                letter-spacing: .1rem;
+                text-decoration: none;
+                text-transform: uppercase;
+            }
+
+            .m-b-md {
+                margin-bottom: 30px;
+            }
+        </style>
+<div class="flex-center position-ref full-height">
+<div class="content">
+    <div class="title m-b-md">
+        Freeman Casting Company
+    </div>
 </div>
-<div class="panel panel-primary">
-    <div class="panel-heading"><h1 class="panel-title">Home</h1></div>
-
-    <div class="panel-body">
-        <a href="{{ route('productions.create') }}" class="btn btn-primary pull-right">Create New Production</a>
-        <strong>Current Productions</strong>
-        <ul>
-        @foreach ($list as $production)
-        		<li>
-            		<a href="{{ route('productions.edit', $production->id) }}">{{ $production->name }}</a>
-        			<ul>
-        			@foreach ($production->budgets as $budget)
-        				<li><a href="{{ route('budgets.show', $budget->id) }}">{{ $budget->name }}</a></li>
-        			@endforeach
-    				<li><a href="{{ route('budgets.create', ['production_id' => $production->id]) }}"><em>Create a New Budget</em></a></li>
-        			</ul>
-        		</li>
-        @endforeach
-        </ul>
-
-    </div>
-
-    <div class="panel-body">
-        <strong>Completed Productions</strong>
-        <ul>
-
-        </ul>
-    </div>
 </div>
 @endsection

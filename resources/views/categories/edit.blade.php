@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="small">
+<div>
 	<a href="{{ route('home') }}"><strong>Home</strong></a>
 	&gt; <a href="{{ route('settings') }}"><strong>System Settings</strong></a>
 	&gt; <a href="{{ route('categories.index') }}"><strong>Rate Class Categories</strong></a>

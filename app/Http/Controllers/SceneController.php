@@ -99,7 +99,7 @@ class SceneController extends Controller {
 
 		} else {
 			// applies to all days
-			$scene = Scene::findOrFail($id)->fill($request->all());
+			$scene = Scene::findOrFail($scene_id)->fill($request->all());
 			$scene->save();
 		}
 

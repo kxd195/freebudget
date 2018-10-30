@@ -4,10 +4,10 @@
 	$person = isset($person) ? $person : new App\Person();
 	$wrangler_rate = isset($wrangler) ? $wrangler : 0;
 @endphp
-<tr class="small {{ !isset($counter) ? 'hidden master-row' : '' }}" data-iteration="{{ $name_index }}">
+<tr class="{{ !isset($counter) ? 'hidden master-row' : '' }}" data-iteration="{{ $name_index }}">
 <td headers="qty_col" class="@if ($errors->has('qty')) has-error @endif">
-	{{ Form::number("people[{$name_index}][qty]", isset($person->qty) ? $person->qty : 1, ['class' => 'form-control text-right', 
-		'id' => "qty{$id_index}", 'min' => 1, 'step' => 'any']) }}
+	{{ Form::text("people[{$name_index}][qty]", isset($person->qty) ? $person->qty : 1, ['class' => 'form-control text-right', 
+		'id' => "qty{$id_index}"]) }}
 	@if ($errors->has('qty')) <p class="help-block">{{ $errors->first('qty') }}</p> @endif
 </td>
 <td headers="description_col" class="@if ($errors->has('description')) has-error @endif">
@@ -24,8 +24,11 @@
 			<optgroup label="{{ $category->name }}">
 			@foreach ($category->rate_classes as $rc)
 				<option value="{{ $rc->id }}" {{ $rc->id == $person->rate_class_id ? 'selected="selected"' : '' }}
-					data-rate="{{ $rc->code === 'WR' ? $wrangler_rate : $rc->rate }}" data-hours="{{ $rc->min_hours }}" 
-					data-code="{{ $rc->code }}" data-addon="{{ $rc->is_addon }}">
+					data-rate="{{ $rc->code === 'WR' ? $wrangler_rate : $rc->rate }}" 
+					data-daily="{{ $rc->is_daily ? 'true' : 'false' }}"
+					data-hours="{{ $rc->min_hours }}" 
+					data-code="{{ $rc->code }}" 
+					data-addon="{{ $rc->is_addon ? 'true' : 'false' }}">
 					{{ $rc->code }} - {{ $rc->name }}
 				</option>
 				@php 
@@ -37,22 +40,34 @@
 		@endforeach
 	</select>
 	@if ($errors->has('rate_class_id')) <p class="help-block">{{ $errors->first('rate_class_id') }}</p> @endif
-	<div class="checkbox quick-action-buttons" style="{{ !$showQuickActions ? 'display:none' : '' }}">
-		<a href="#" onclick="doQuickAction(this, 'RB');" class="btn btn-warning btn-xs has-tooltip"
-			 data-toggle="tooltip" data-placement="bottom" 
-			 title="Adds a Rehearsal/Blocking item with this entry">Add RB</a>
+	<div class="checkbox quick-action-buttons" style="{{ !$showQuickActions ? 'display:none;' : '' }}">
+		<a href="#" onclick="doQuickAction(this, 'V');" class="btn btn-warning btn-xs has-tooltip"
+			 data-toggle="tooltip" data-placement="bottom" style="font-size:80%;"
+			 title="Adds a Vehicle item with this entry">+Vehicle</a>
 
-		<a href="#" onclick="doQuickAction(this, 'WC');" class="btn btn-warning btn-xs has-tooltip"
-			 data-toggle="tooltip" data-placement="bottom" 
-			 title="Adds a Wardrobe Change item with this entry">Add WC</a>	
+		<a href="#" onclick="doQuickAction(this, 'P');" class="btn btn-warning btn-xs has-tooltip"
+			 data-toggle="tooltip" data-placement="bottom" style="font-size:80%;" 
+			 title="Adds a Prop item with this entry">+Prop</a>
+
+		<a href="#" onclick="doQuickAction(this, 'D');" class="btn btn-warning btn-xs has-tooltip"
+			 data-toggle="tooltip" data-placement="bottom" style="font-size:80%;" 
+			 title="Adds a Dog item with this entry">+Dog</a>
 
 		<a href="#" onclick="doQuickAction(this, 'WF');" class="btn btn-warning btn-xs has-tooltip"
-			 data-toggle="tooltip" data-placement="bottom" 
-			 title="Adds a Wardrobe Fitting item with this entry">Add WF</a>	
+			 data-toggle="tooltip" data-placement="bottom" style="font-size:80%;" 
+			 title="Adds a Wardrobe Fitting item with this entry">+WF</a>	
+
+		<a href="#" onclick="doQuickAction(this, 'WC');" class="btn btn-warning btn-xs has-tooltip"
+			 data-toggle="tooltip" data-placement="bottom" style="font-size:80%;" 
+			 title="Adds a Wardrobe Change item with this entry">+WC</a>	
+
+		<a href="#" onclick="doQuickAction(this, 'C');" class="btn btn-warning btn-xs has-tooltip"
+			 data-toggle="tooltip" data-placement="bottom" style="font-size:80%;" 
+			 title="Adds a Costume item with this entry">+Costume</a>	
 	</div>
 </td>
 <td headers="hours_col" class="@if ($errors->has('hours')) has-error @endif">
-	{{ Form::number("people[{$name_index}][hours]", number_format($person->hours, 1), ['class' => 'form-control text-right', 
+	{{ Form::text("people[{$name_index}][hours]", number_format($person->hours > 0 ? $person->hours : 8, 1), ['class' => 'form-control text-right', 
 		'id' => "hours{$id_index}", 'min' => ($person->rateclass !== null ? $person->rateclass->min_hours : 0), 
 		'step' => 'any', 'data-toggle' => 'tooltip', 'data-placement' => 'bottom', 'data-default-title' => 'Minimum: ']) }}
 	@if ($errors->has('hours')) <p class="help-block">{{ $errors->first('hours') }}</p> @endif

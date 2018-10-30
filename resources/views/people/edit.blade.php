@@ -9,7 +9,7 @@
 @endsection
 
 @section('content')
-<div class="small">
+<div>
 	<a href="{{ route('home') }}"><strong>Home</strong></a>
 	&gt; <a href="{{ route('productions.edit', $entry->budget->production_id) }}"><strong>{{ $entry->budget->production->name }}</strong></a>
 	&gt; <a href="{{ route('budgets.show', ['id' => $entry->budget_id]) }}"><strong>{{ $entry->budget->name }}</strong></a>
@@ -63,32 +63,41 @@
 							<option disabled {{ !isset($entry->scene_id) ? "selected" : "" }}>Select...</option>
 							@foreach($entry->budget->scenes as $scene)
 								<option 
+									data-episode="{{ $scene->episode }}"
 									data-location="{{ $scene->location }}"
 									data-description="{{ $scene->description }}"
 									data-notes="{{ $scene->notes }}"
-									{{ $entry->scene_id === $scene->id ? "selected" : "" }}
+									{{ $entry->scene_id == $scene->id ? "selected" : "" }}
 									value="{{ $scene->id }}">{{ $scene->name }}</option>
 							@endforeach
 						</select>
 					</label>
 				</div>
 
-				<div id="pane-scene-existing" class="small" style="display:none;">
+				<div id="pane-scene-existing" style="display:none;">
 				<div class="row">
-					<div class="col-md-2 col-md-offset-1"><strong>Scene Name:</strong></div>
-					<div class="col-md-3" id="scene-existing-name"></div>
-					<div class="col-md-2 col-md-offset-1"><strong>Location:</strong></div>
-					<div class="col-md-3" id="scene-existing-location"></div>
+					<div class="col-md-3 col-md-offset-1"><strong>Episode:</strong></div>
+					<div class="col-md-8" id="scene-existing-episode"></div>
 				</div>
 
 				<div class="row">
-					<div class="col-md-2 col-md-offset-1"><strong>Description:</strong></div>
-					<div class="col-md-3" id="scene-existing-description"></div>
+					<div class="col-md-3 col-md-offset-1"><strong>Scene #s:</strong></div>
+					<div class="col-md-8" id="scene-existing-name"></div>
 				</div>
 
 				<div class="row">
-					<div class="col-md-2 col-md-offset-1"><strong>Notes:</strong></div>
-					<div class="col-md-3" id="scene-existing-notes"></div>
+					<div class="col-md-3 col-md-offset-1"><strong>Scene Description:</strong></div>
+					<div class="col-md-8" id="scene-existing-description"></div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-3 col-md-offset-1"><strong>Shoot Location(s):</strong></div>
+					<div class="col-md-8" id="scene-existing-location"></div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-3 col-md-offset-1"><strong>Notes:</strong></div>
+					<div class="col-md-8" id="scene-existing-notes"></div>
 				</div>
 				</div>
 			</div>
@@ -103,30 +112,37 @@
 
 			<div id="pane-scene-new" style="display:none;">
 			<div class="form-group">
-				{{ Form::labelRequired('scene[name]', 'Scene Name:', ['class' => 'col-md-2 col-md-offset-1 control-label']) }}
-				<div class="col-md-9">
+				{{ Form::label('scene[episode]', 'Scene Episode:', ['class' => 'col-md-3 col-md-offset-1 control-label']) }}
+				<div class="col-md-8">
+				{{ Form::text('scene[episode]', $entry->budget->episode, ['size' => 50, 'class' => 'form-control']) }}
+				</div>
+			</div>
+
+			<div class="form-group">
+				{{ Form::labelRequired('scene[name]', 'Scene #s:', ['class' => 'col-md-3 col-md-offset-1 control-label']) }}
+				<div class="col-md-8">
 				{{ Form::text('scene[name]', '', ['size' => 50, 'class' => 'form-control']) }}
 				@if ($errors->has('scene[name]')) <p class="help-block">{{ $errors->first('scene[name]') }}</p> @endif
 				</div>
 			</div>
 
 			<div class="form-group">
-				{{ Form::label('scene[description]', 'Description:', ['class' => 'col-md-2 col-md-offset-1 control-label']) }}
-				<div class="col-md-9">
+				{{ Form::label('scene[description]', 'Scene Description:', ['class' => 'col-md-3 col-md-offset-1 control-label']) }}
+				<div class="col-md-8">
 				{{ Form::text('scene[description]', '', ['size' => 50, 'class' => 'form-control']) }}
 				</div>
 			</div>
 
 			<div class="form-group">
-				{{ Form::label('scene[location]', 'Location:', ['class' => 'col-md-2 col-md-offset-1 control-label']) }}
-				<div class="col-md-9">
+				{{ Form::label('scene[location]', 'Shoot Location(s):', ['class' => 'col-md-3 col-md-offset-1 control-label']) }}
+				<div class="col-md-8">
 				{{ Form::text('scene[location]', '', ['size' => 50, 'class' => 'form-control']) }}
 				</div>
 			</div>
 
 			<div class="form-group">
-				{{ Form::label('scene[notes]', 'Notes:', ['class' => 'col-md-2 col-md-offset-1 control-label']) }}
-				<div class="col-md-9">
+				{{ Form::label('scene[notes]', 'Notes:', ['class' => 'col-md-3 col-md-offset-1 control-label']) }}
+				<div class="col-md-8">
 				{{ Form::text('scene[notes]', '', ['size' => 50, 'class' => 'form-control']) }}
 				</div>
 			</div>
@@ -141,7 +157,7 @@
 	<thead>
 		<tr>
 			<th id="qty_col" class="col-md-1 text-center">{{ Form::labelRequired('qty', 'Qty', ['class' => 'control-label']) }}</th>
-			<th id="description_col" class="col-md-2 text-center">{{ Form::labelRequired('description', 'Description', ['class' => 'control-label']) }}</th>
+			<th id="description_col" class="col-md-2 text-center">{{ Form::labelRequired('description', 'BG Description/Label', ['class' => 'control-label']) }}</th>
 			<th id="rate_class_col" class="col-md-3 text-center">{{ Form::labelRequired('rate_class', 'Rate Class', ['class' => 'control-label']) }}</th>
 			<th id="hours_col" class="col-md-1 text-center">
 				{{ Form::labelRequired('hours', 'Hours', ['class' => 'control-label']) }}

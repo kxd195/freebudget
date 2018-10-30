@@ -9,7 +9,15 @@
 	<div class="modal-body">
 		<div class="form form-horizontal">
 			<div class="form-group">
-				{{ Form::labelRequired('name', 'Scene Name:', ['class' => 'col-md-3 control-label']) }}
+				{{ Form::label('episode', 'Episode:', ['class' => 'col-md-3 control-label']) }}
+				<div class="col-md-9">
+				{{ Form::text('episode', '', ['size' => 50, 'class' => 'form-control', 'id' => 'episode']) }}
+				@if ($errors->has('episode')) <p class="help-block">{{ $errors->first('episode') }}</p> @endif
+				</div>
+			</div>
+
+			<div class="form-group">
+				{{ Form::labelRequired('name', 'Scene #s:', ['class' => 'col-md-3 control-label']) }}
 				<div class="col-md-9">
 				{{ Form::text('name', '', ['size' => 50, 'class' => 'form-control', 'id' => 'scene-name']) }}
 				@if ($errors->has('name')) <p class="help-block">{{ $errors->first('name') }}</p> @endif
@@ -17,14 +25,14 @@
 			</div>
 
 			<div class="form-group">
-				{{ Form::label('description', 'Description:', ['class' => 'col-md-3 control-label']) }}
+				{{ Form::label('description', 'Scene Description:', ['class' => 'col-md-3 control-label']) }}
 				<div class="col-md-9">
 				{{ Form::text('description', '', ['size' => 50, 'class' => 'form-control']) }}
 				</div>
 			</div>
 
 			<div class="form-group">
-				{{ Form::label('location', 'Location:', ['class' => 'col-md-3 control-label']) }}
+				{{ Form::label('location', 'Shoot Location(s):', ['class' => 'col-md-3 control-label']) }}
 				<div class="col-md-9">
 				{{ Form::text('location', '', ['size' => 50, 'class' => 'form-control']) }}
 				</div>

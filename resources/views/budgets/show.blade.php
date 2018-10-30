@@ -20,7 +20,7 @@
 	</div>
 @endif
 
-<div class="small">
+<div class="no-print">
 	<a href="{{ route('home') }}"><strong>Home</strong></a>
 	&gt; <a href="{{ route('productions.edit', $budget->production_id) }}"><strong>{{ $budget->production->name }}</strong></a>
 	&gt; {{ $budget->name }}
@@ -32,7 +32,7 @@
 	<div class="panel-heading">
 		<h1 class="panel-title">{{ $budget->name }}
 		@unless ($from_share)
-			<button type="button" class="btn btn-info btn-xs pull-right" data-toggle="modal" data-target="#shareModal">
+			<button type="button" class="btn btn-info btn-xs pull-right no-print" data-toggle="modal" data-target="#shareModal">
 				<span class="glyphicon glyphicon-share"></span>
 				Share
 			</button>
@@ -42,67 +42,60 @@
 	
 	<div class="panel-body form-horizontal">
 		<div class="row">
-			<label class="col-md-2">Production Name:</label>
-			<div class="col-md-4">{{ $budget->production->name }}</div>
-			<label class="col-md-2">Type:</label>
-			<div class="col-md-4">{{ $budget->production->type }}</div>
+			<label class="col-xs-2">Production Name:</label>
+			<div class="col-xs-4">{{ $budget->production->name }}</div>
+			<label class="col-xs-2">Type:</label>
+			<div class="col-xs-4">{{ $budget->production->type }}</div>
 		</div>
 
 		<div class="row">
-			<label class="col-md-2">Season:</label>
-			<div class="col-md-4">{{ $budget->production->season }}</div>
-			@if ($budget->production->type === App\Production::TYPE_SERIES || $budget->production->type === App\Production::FEATURE)
-				<label class="col-md-2">{{ $budget->production->type === App\Production::TYPE_SERIES ? '# of Episodes' : '# of Shoot Days' }}:</label>
-				<div class="col-md-4">{{ $budget->production->qty }}</div>
+			<label class="col-xs-2">Season:</label>
+			<div class="col-xs-4">{{ $budget->production->season }}</div>
+			@if ($budget->production->type === App\Production::TYPE_SERIES || $budget->production->type === App\Production::TYPE_FEATURE)
+				<label class="col-xs-2">{{ $budget->production->type === App\Production::TYPE_SERIES ? '# of Episodes' : '# of Shoot Days' }}:</label>
+				<div class="col-xs-4">{{ $budget->production->qty }}</div>
 			@endif
 		</div>
 
 		<div class="row">
-			<label class="col-md-2">Episode:</label>
-			<div class="col-md-4">{{ $budget->episode }}</div>
+			<label class="col-xs-2">Episode:</label>
+			<div class="col-xs-4">{{ $budget->episode }}</div>
 		</div>
 	
 		@isset ($budget->version_info)
 			<div class="row">
-				<label class="col-md-2">Tagged Version:</label>
-				<div class="col-md-10 text-danger">
+				<label class="col-xs-2">Tagged Version:</label>
+				<div class="col-xs-10 text-danger">
 					<strong>{{ $budget->version_info->name or '' }}</strong>
 					{{ $budget->version_info->created_at }}
-					<small>by {{ $budget->version_info->user->name }}</small>
+					by {{ $budget->version_info->user->name }}
 				</div>
 			</div>
 		@endisset
 		
 		<div class="row">
-			<label class="col-md-2">Start Date:</label>
-			<div class="col-md-4">{{ $budget->startdate !== null ? $budget->startdate->format('D, M j, Y') : "" }}</div>
-			<label class="col-md-2">{{ $budget->enddate !== null ? 'End Date' : '# of Shoot Days' }}:</label>
-			<div class="col-md-4">{{ $budget->enddate !== null ? $budget->enddate->format('D, M j, Y') : $budget->num_days }}</div>
+			<label class="col-xs-2">Start Date:</label>
+			<div class="col-xs-4">{{ $budget->startdate !== null ? $budget->startdate->format('D, M j, Y') : "" }}</div>
+			<label class="col-xs-2">{{ $budget->enddate !== null ? 'End Date' : '# of Shoot Days' }}:</label>
+			<div class="col-xs-4">{{ $budget->enddate !== null ? $budget->enddate->format('D, M j, Y') : $budget->num_days }}</div>
 		</div>
 
-		@isset ($budget->description)
-			<div class="row">
-				<label class="col-md-2">Description:</label>
-				<div class="col-md-10">{!! nl2br($budget->description) !!}</div>
-			</div>
-		@endisset
+		<div class="row">
+			<label class="col-xs-2">Current Date:</label>
+			<div class="col-xs-4">{{ Carbon\Carbon::now('Canada/Pacific')->format('D, M j, Y') }}</div>
+			<label class="col-xs-2">Current Time:</label>
+			<div class="col-xs-4">{{ Carbon\Carbon::now('Canada/Pacific')->format('h:i A T') }}</div>
+		</div>
 
-		@isset ($budget->notes)
-			<div class="row">
-				<label class="col-md-2">Notes:</label>
-				<div class="col-md-10">{!! nl2br($budget->notes) !!}</div>
-			</div>
-		@endisset
-		
 		@if (isset($budget->budget_versions) && count($budget->budget_versions) > 0 && !$readonly)
 			<div class="row">
-				<label class="col-md-2">Previous Versions:</label>
-				<div class="col-md-10">
+				<label class="col-xs-2">Previous Versions:</label>
+				<div class="col-xs-10">
 				<ul>
 					@foreach ($budget->budget_versions->reverse() as $version)
 					<li>
 						<a href="{{ route('budgets.version', [$budget->id, $version->id]) }}" target="_blank"><strong>{{ $version->name or '' }}</strong> {{ $version->created_at->setTimezone('Canada/Pacific') }}</a>
-						<small>by {{ $version->user->name }}</small>
+						by {{ $version->user->name }}
 					</li>
 					@endforeach
 				</ul>
@@ -111,15 +104,15 @@
 		@endif
 	</div>
 	</div>
-	
+
 	@if (sizeof($budget->days) !== 0)
 		@include('budgets.daytabs-table')
 	@endif
 </div>
-<div class="col-md-2">
+<div class="col-md-2 no-print">
 	<div class="panel panel-primary">
-	<div class="panel-heading">Grand Totals</div>
-	<div class="panel-body form-horizontal small">
+	<div class="panel-heading">Summary</div>
+	<div class="panel-body form-horizontal">
   	  	@foreach ($units as $unit)
 			@php $amount = $unit->calcTotalAmount($budget->days) @endphp
 		
@@ -156,15 +149,12 @@
 	</div>
 
 	@unless ($readonly)
-		<div class="form-group">
-		<button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#tagVersionModal">Tag Budget Version</button>
-		<a href="{{ route('budgets.edit', $budget->id) }}" class="btn btn-info btn-block">Modify Budget Details</a>
+		<div class="form-group no-print">
 		<a href="{{ route('days.create', ['budget_id' => $budget->id ]) }}" class="btn btn-info btn-block">Create a New Day</a>
-		@include('budgets.show-tagVersion')
 		</div>
 	@endunless
-
-	<div class="form-group">
+		
+	<div class="form-group no-print">
 	<select id="day-quickjump" name="day-quickjump" class="form-control" onchange="dayQuickjump()">
 		<option value="ALL">Show All Days</option>
 		@foreach ($budget->days as $day)
@@ -174,7 +164,30 @@
 	</div>
 
 	@unless ($readonly)
-	<a href="{{ route('people.create', ['budget_id' => $budget->id]) }}" class="btn btn-info btn-block">Add Entries</a>
+		<div class="form-group no-print">
+		<a href="{{ route('budgets.edit', $budget->id) }}" class="btn btn-info btn-block">Modify Budget Details</a>
+		<button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#tagVersionModal">Tag Budget Version</button>
+		@include('budgets.show-tagVersion')
+		</div>
+	@endunless
+
+	
+	@unless ($readonly)
+		<div class="form-group no-print">
+		<a href="{{ route('people.create', ['budget_id' => $budget->id]) }}" class="btn btn-info btn-block no-print">Add Entries</a>
+		</div>
+	@endunless
+
+	@unless ($readonly)
+	<div class="form-group no-print">
+	{{ Form::open(['route' => 'people.delete', 'class' => 'form-inline', 'id' => 'deleteForm']) }}
+		{{ Form::hidden('budget_id', $budget->id)}}
+		<button type="submit" class="btn btn-danger btn-block" onclick="return confirmDeleteSelected();">
+			Delete Selected Entries
+		</button>
+		
+	{{ Form::close() }}
+	</div>
 	@endunless
 
 </div>

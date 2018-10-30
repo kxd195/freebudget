@@ -4,7 +4,7 @@
 @component('components.messages')
 @endcomponent
 
-<div class="small">
+<div>
 	<a href="{{ route('home') }}">Home</a>
 	&gt; Login
 </div>

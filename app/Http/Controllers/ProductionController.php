@@ -25,7 +25,10 @@ class ProductionController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        return view('productions.list', ['list' => Production::all()->sortBy('name')]);
+        foreach (Production::getTypes() as $type)
+            $list[$type] = Production::where('type', $type)->orderBy('name')->get();
+
+        return view('productions.list', ['list' => $list]);
     }
 
     /**
@@ -65,7 +68,7 @@ class ProductionController extends Controller {
      */
     public function edit($id) {
         $entry = $id !== 0 ? Production::findOrFail($id) : new Production();
-        return view('productions.edit', ['entry' => $entry]);
+        return view('productions.edit', ['entry' => $entry, 'fullscreen' => true]);
     }
 
     /**
@@ -86,6 +89,10 @@ class ProductionController extends Controller {
                     ->withInput();
         }
         
+        if ($id === 0)
+            return redirect()->route('budgets.create', ['production_id' => $entry->id])
+                    ->with('message', 'The production "' . $entry->name . '" has been successfully created!');
+
         return redirect()->route('productions.index')
                 ->with('message', 'Your changes has been successfully saved!');
     }

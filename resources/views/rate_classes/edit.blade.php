@@ -1,7 +1,11 @@
 @extends('layouts.app')
 
+@section('scripts')
+<script type="text/javascript" src="{{ asset('js/rate_classes.js') }}"></script>
+@endsection
+
 @section('content')
-<div class="small">
+<div>
 	<a href="{{ route('home') }}"><strong>Home</strong></a>
 	&gt; <a href="{{ route('settings') }}"><strong>System Settings</strong></a>
 	&gt; <a href="{{ route('rate_classes.index') }}"><strong>Rate Classes</strong></a>
@@ -38,7 +42,26 @@
 		@if ($errors->has('code')) <p class="help-block">{{ $errors->first('code') }}</p> @endif
 	</div>
 
-	<div class="form-group @if ($errors->has('min_hours')) has-error @endif">
+	<div class="form-group @if ($errors->has('is_daily')) has-error @endif">
+		{{ Form::label('is_daily', 'Daily?', ['class' => 'col-md-3 control-label']) }}
+		<div class="col-md-9">
+		<div class="radio">
+			<label>
+			{{ Form::radio('is_daily', '0', !$entry->is_daily ? true : false, ['onclick' => 'toggleView();']) }}
+			No
+			</label>
+		</div>
+		<div class="radio">
+			<label>
+			{{ Form::radio('is_daily', '1', $entry->is_daily ? true : false, ['onclick' => 'toggleView();']) }}
+			Yes
+			</label>
+		</div>
+		@if ($errors->has('is_daily')) <p class="help-block">{{ $errors->first('is_daily') }}</p> @endif
+		</div>
+	</div>
+
+	<div id="pane-min-hours" class="form-group @if ($errors->has('min_hours')) has-error @endif">
 		{{ Form::label('min_hours', 'Min. Hours:', ['class' => 'col-md-3 control-label']) }}
 		<div class="col-md-2">
 		{{ Form::number('min_hours', $value = null, ['class' => 'form-control', 'step' => 'any']) }}
@@ -46,16 +69,16 @@
 		@if ($errors->has('min_hours')) <p class="help-block">{{ $errors->first('min_hours') }}</p> @endif
 	</div>
 
-    	<div class="form-group @if ($errors->has('rate')) has-error @endif">
-    		{{ Form::label('rate', 'Rate:', ['class' => 'col-md-3 control-label']) }}
-    		<div class="col-md-3">
-    		<div class="input-group">
-        		<span class="input-group-addon">$</span>
-        		{{ Form::number('rate', $value = null, ['class' => 'form-control', 'step' => 'any']) }}
-    		</div>
-    		</div>
-        	@if ($errors->has('rate')) <p class="help-block">{{ $errors->first('rate') }}</p> @endif
-    	</div>
+	<div class="form-group @if ($errors->has('rate')) has-error @endif">
+		{{ Form::label('rate', 'Rate:', ['class' => 'col-md-3 control-label']) }}
+		<div class="col-md-3">
+		<div class="input-group">
+    		<span class="input-group-addon">$</span>
+    		{{ Form::number('rate', $value = null, ['class' => 'form-control', 'step' => 'any']) }}
+		</div>
+		</div>
+    	@if ($errors->has('rate')) <p class="help-block">{{ $errors->first('rate') }}</p> @endif
+	</div>
 
 	<div class="form-group @if ($errors->has('is_addon')) has-error @endif">
 		{{ Form::label('is_addon', 'For Addons Only?', ['class' => 'col-md-3 control-label']) }}

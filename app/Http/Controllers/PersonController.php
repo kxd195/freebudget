@@ -87,9 +87,11 @@ class PersonController extends Controller {
 		if ($id === 0)
 			$entry->scene = session('last_scene');
 	   
-		$categories = Category::with('rate_classes')->get()->sortBy('name');
+		$categories = Category::with('rate_classes')->get()->sortBy(function($i) {
+			return strpos(strtoupper($i->name), 'ADDONS') === 0 ? 'ZZZ' . $i->name : $i->name;
+		});
 
-		$day_entries = $entry->budget->days->sortBy('actualdate');
+		$day_entries = $entry->budget->days->sortBy(['is_default_day DESC', 'actualdate']);
 		$day_entries->map(function($i) {
 			// add the day name and actualdate to a new column called display_name
 			$i['display_name'] = $i->generateName();
@@ -97,7 +99,6 @@ class PersonController extends Controller {
 		});
 
 		$days = $day_entries->pluck('display_name', 'id');
-		$days->prepend("Additional Entries", '');
 
 		$units = Unit::all()->pluck('name', 'id');
 		
@@ -160,15 +161,33 @@ class PersonController extends Controller {
 				// fill with the rest of the data
 				$person->fill($person_data);
 
+				if (isset($person->description))
+					$last_description = $person->description;
+				else if (isset($last_description))
+					$person->description = $last_description;
+				else 
+					continue;
+
 				$isFirstEntry = true;
 				foreach ($day_ids as $day_id) {
 					$person_entry = $isFirstEntry ? $person : $person->replicate();
 					$person_entry->day_id = empty($day_id) ? null : $day_id;
 
-					$rateclass = RateClass::findOrFail($person_entry->rate_class_id);
-					if ($rateclass->code === 'NUT' && $person_entry->cost_overridden
-							&& $person_entry->cost > $rateclass->rate) {
-						$person_entry->rate_class_id = RateClass::where('code', 'NUHR')->first()->id;
+					$rateclass = RateClass::find($person_entry->rate_class_id);
+
+					if ($rateclass != null) {
+						if ($rateclass->code === 'NUT' && $person_entry->cost_overridden
+								&& $person_entry->cost > $rateclass->rate) {
+							$person_entry->rate_class_id = RateClass::where('code', 'NUHR')->first()->id;
+						}
+
+						if ($rateclass->code === 'AS')
+							$person_entry->scene_id = null;
+
+						if ($rateclass->is_daily)
+							$person_entry->hours = 1;
+					} else {
+						$person_entry->hours = 0;
 					}
 
 					$person_entry->disableVersioning();
@@ -192,7 +211,7 @@ class PersonController extends Controller {
 
         Scene::removeOrphans($request->budget_id);
 
-		return redirect()->route('budgets.show', $request->budget_id)
+		return redirect()->to(route('budgets.show', $request->budget_id) . '#day-' . $day_ids[0])
 				->with('message', 'Your changes has been successfully saved!');
 	}
 
@@ -241,5 +260,14 @@ class PersonController extends Controller {
 		return redirect()->route('budgets.show', $entry->budget_id)
 				->with('message-warning', 'The person "' . $entry->description . '" has been successfully deleted!')
 				->with('show_day_id', $entry->day_id);
+	}
+
+	public function delete(Request $request) {
+		if (isset($request->delete_entry_id))
+			foreach ($request->delete_entry_id as $id)
+				Person::findOrFail($id)->delete();
+		
+		return redirect()->route('budgets.show', $request->budget_id)
+				->with('message-warning', 'The selected entries has been successfully deleted!');
 	}
 }
